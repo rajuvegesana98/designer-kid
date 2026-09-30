@@ -33,6 +33,8 @@ export interface AppUser {
   email: string
   name: string
   isAdmin: boolean
+  /** Suspended by an admin. */
+  blocked?: boolean
 }
 
 export interface LearnerRow {
@@ -43,6 +45,8 @@ export interface LearnerRow {
   state: LearnerState
   createdAt: string
   lastActiveAt: string
+  blocked: boolean
+  isAdmin: boolean
 }
 
 export interface ContentVersion {
@@ -112,10 +116,14 @@ export interface DataStore {
   mode: 'local' | 'supabase'
 
   currentUser(): Promise<AppUser | null>
-  onAuthChange(cb: (user: AppUser | null) => void): () => void
+  onAuthChange(cb: (user: AppUser | null, event?: string) => void): () => void
   signUp(name: string, email: string, password: string): Promise<SignUpResult>
   signIn(email: string, password: string): Promise<AppUser>
   signOut(): Promise<void>
+  /** Emails a password-reset link. */
+  requestPasswordReset(email: string): Promise<void>
+  /** Sets a new password for the signed-in user (also used after a reset link). */
+  updatePassword(password: string): Promise<void>
   /** Local mode only: open the admin panel for this browser. */
   enterDemoAdmin?(): Promise<AppUser>
 
@@ -133,6 +141,10 @@ export interface DataStore {
   submitChallenge(user: AppUser, challengeId: string, link: string, notes: string): Promise<void>
 
   listLearners(): Promise<LearnerRow[]>
+  /** Admin: edit a learner's name, level or suspension. */
+  updateLearnerProfile(id: string, patch: { name?: string; level?: LevelId | null; blocked?: boolean }): Promise<void>
+  resetLearnerProgress(id: string): Promise<void>
+  setAdmin(id: string, admin: boolean): Promise<void>
   listEvents(limit: number): Promise<ActivityEvent[]>
   listSubmissions(): Promise<Submission[]>
 

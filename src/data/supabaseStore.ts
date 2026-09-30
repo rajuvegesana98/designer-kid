@@ -29,17 +29,20 @@ function fail(error: { message: string } | null): void {
 }
 
 export function createSupabaseStore(url: string, anonKey: string): DataStore {
-  const sb: SupabaseClient = createClient(url, anonKey, { auth: { flowType: 'pkce', persistSession: true } })
+  // Implicit flow so email links (confirm, password reset) work even when opened on another device.
+  const sb: SupabaseClient = createClient(url, anonKey, { auth: { flowType: 'implicit', persistSession: true, detectSessionInUrl: true } })
+  const siteUrl = () => window.location.origin + import.meta.env.BASE_URL
 
   async function toAppUser(user: User | null | undefined): Promise<AppUser | null> {
     if (!user) return null
     const { data: isAdmin } = await sb.rpc('is_admin')
-    const { data: profile } = await sb.from('profiles').select('name').eq('id', user.id).maybeSingle()
+    const { data: profile } = await sb.from('profiles').select('*').eq('id', user.id).maybeSingle()
     return {
       id: user.id,
       email: user.email ?? '',
       name: profile?.name || (user.user_metadata?.name as string) || user.email?.split('@')[0] || 'Learner',
       isAdmin: Boolean(isAdmin),
+      blocked: Boolean(profile?.blocked),
     }
   }
 
@@ -68,9 +71,9 @@ export function createSupabaseStore(url: string, anonKey: string): DataStore {
       return toAppUser(data.session?.user)
     },
     onAuthChange(cb) {
-      const { data } = sb.auth.onAuthStateChange((_event, session) => {
+      const { data } = sb.auth.onAuthStateChange((event, session) => {
         // Defer: calling Supabase inside this callback can deadlock the auth lock.
-        setTimeout(() => void toAppUser(session?.user).then(cb), 0)
+        setTimeout(() => void toAppUser(session?.user).then((u) => cb(u, event)), 0)
       })
       return () => data.subscription.unsubscribe()
     },
@@ -78,7 +81,7 @@ export function createSupabaseStore(url: string, anonKey: string): DataStore {
       const { data, error } = await sb.auth.signUp({
         email,
         password,
-        options: { data: { name }, emailRedirectTo: window.location.origin + import.meta.env.BASE_URL },
+        options: { data: { name }, emailRedirectTo: siteUrl() },
       })
       fail(error)
       if (!data.session) return { needsConfirmation: true }
@@ -92,6 +95,14 @@ export function createSupabaseStore(url: string, anonKey: string): DataStore {
     },
     async signOut() {
       await sb.auth.signOut()
+    },
+    async requestPasswordReset(email) {
+      const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: `${siteUrl()}reset-password` })
+      fail(error)
+    },
+    async updatePassword(password) {
+      const { error } = await sb.auth.updateUser({ password })
+      fail(error)
     },
 
     async loadPublished() {
@@ -156,9 +167,11 @@ export function createSupabaseStore(url: string, anonKey: string): DataStore {
     async listLearners(): Promise<LearnerRow[]> {
       const { data, error } = await sb
         .from('profiles')
-        .select('id, name, email, level, state, created_at, last_active_at')
+        .select('*')
         .order('created_at', { ascending: false })
       fail(error)
+      const { data: admins } = await sb.from('admins').select('user_id')
+      const adminIds = new Set((admins ?? []).map((a) => a.user_id as string))
       return (data ?? []).map((p) => ({
         id: p.id,
         name: p.name ?? '',
@@ -167,7 +180,33 @@ export function createSupabaseStore(url: string, anonKey: string): DataStore {
         state: p.state as LearnerState,
         createdAt: p.created_at,
         lastActiveAt: p.last_active_at,
+        blocked: Boolean(p.blocked),
+        isAdmin: adminIds.has(p.id),
       }))
+    },
+    async updateLearnerProfile(id, patch) {
+      const row: Record<string, unknown> = { ...patch }
+      if (patch.name !== undefined || patch.level !== undefined) {
+        // The learner's saved state also carries name and level; keep both in step.
+        const { data } = await sb.from('profiles').select('state').eq('id', id).single()
+        const state = { ...(data?.state ?? {}) } as Record<string, unknown>
+        if (patch.name !== undefined) state.name = patch.name
+        if (patch.level !== undefined) state.level = patch.level
+        row.state = state
+      }
+      const { error } = await sb.from('profiles').update(row).eq('id', id)
+      fail(error)
+    },
+    async resetLearnerProgress(id) {
+      const { data } = await sb.from('profiles').select('state').eq('id', id).single()
+      const s = (data?.state ?? {}) as Partial<LearnerState>
+      const state = { ...s, completedLessons: {}, completedChallenges: {}, careerChecks: {}, bookmarks: [], notes: {}, activeDays: [], challengeWork: {}, lastLesson: null, updatedAt: new Date().toISOString() }
+      const { error } = await sb.from('profiles').update({ state }).eq('id', id)
+      fail(error)
+    },
+    async setAdmin(id, admin) {
+      const { error } = admin ? await sb.from('admins').insert({ user_id: id }) : await sb.from('admins').delete().eq('user_id', id)
+      fail(error)
     },
     async listEvents(limit) {
       const { data, error } = await sb.from('events').select('*').order('created_at', { ascending: false }).limit(limit)

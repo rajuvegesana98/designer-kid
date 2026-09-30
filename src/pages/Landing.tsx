@@ -4,7 +4,8 @@ import type { CSSProperties } from 'react'
 import { Link } from 'react-router'
 import { Brand } from '../components/Brand'
 import { HeroVisual, LevelIllustration } from '../components/Illustrations'
-import { MentorLink, useMentor } from '../components/MentorLink'
+import { MentorSection, useMentor } from '../components/MentorLink'
+import { LatestPosts } from './Blog'
 import { Reveal } from '../components/ui'
 import { store } from '../data'
 import { levelLessons, levelModules } from '../lib/content'
@@ -28,10 +29,15 @@ export function Landing() {
         <Brand />
         <nav className="row" aria-label="Site">
           <a href="#paths" className="btn btn-ghost hide-sm">Learning paths</a>
+          <Link to="/blog" className="btn btn-ghost hide-sm">Blog</Link>
+          {mentor.enabled && <a href="#mentor" className="btn btn-ghost hide-sm">1:1 Connect</a>}
           {store.mode === 'supabase' && !user && (
-            <Link to="/account" className="btn btn-ghost">
-              <LogIn size={18} aria-hidden /> Sign in
-            </Link>
+            <>
+              <Link to="/account" className="btn btn-ghost">
+                <LogIn size={18} aria-hidden /> <span className="hide-sm">Sign in</span>
+              </Link>
+              <Link to="/account?mode=signup" className="btn hide-sm">Create free account</Link>
+            </>
           )}
           <Link to="/start" className="btn btn-primary">Start learning</Link>
         </nav>
@@ -139,21 +145,17 @@ export function Landing() {
 
         <ReviewsSection />
 
-        {mentor.available && (
+        {mentor.enabled && (
           <section className="page" aria-labelledby="mentor-title">
             <Reveal>
-              <div className="card tinted row" style={{ padding: 'var(--space-6)', gap: 'var(--space-5)' }}>
-                {mentor.photo ? <img src={mentor.photo} alt={mentor.name} className="avatar avatar-lg" style={{ width: 88, height: 88 }} /> : <span className="avatar avatar-lg" style={{ width: 88, height: 88, fontSize: '2rem' }}>{mentor.name[0]}</span>}
-                <div className="grow stack" style={{ '--gap': '8px', minWidth: 260 } as CSSProperties}>
-                  <span className="eyebrow">1:1 Connect</span>
-                  <h2 id="mentor-title">Get a human eye on your work</h2>
-                  <p className="muted">{mentor.bio}</p>
-                </div>
-                <MentorLink className="btn btn-primary btn-lg" />
-              </div>
+              <MentorSection id="mentor" />
             </Reveal>
           </section>
         )}
+
+        <section className="page">
+          <LatestPosts title="Latest from the blog" />
+        </section>
 
         {h.faq.length > 0 && (
           <section className="page page-narrow" aria-labelledby="faq-title">
@@ -176,9 +178,12 @@ export function Landing() {
           <Reveal className="stack" style={{ alignItems: 'center', '--gap': '16px' } as CSSProperties}>
             <h2>Ready to find your starting point?</h2>
             <p className="lead">It takes less than a minute.</p>
-            <Link to="/start" className="btn btn-primary btn-lg">
-              {h.ctaLabel} <ArrowRight size={18} aria-hidden />
-            </Link>
+            <div className="row" style={{ justifyContent: 'center' }}>
+              <Link to="/start" className="btn btn-primary btn-lg">
+                {h.ctaLabel} <ArrowRight size={18} aria-hidden />
+              </Link>
+              {store.mode === 'supabase' && !user && <Link to="/account?mode=signup" className="btn btn-lg">Create a free account</Link>}
+            </div>
           </Reveal>
         </section>
       </main>

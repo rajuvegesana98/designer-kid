@@ -3,7 +3,10 @@ import { ArrowRight, BookOpen, Check, Clock, Flame, Layers, PartyPopper, Target,
 import { useMemo, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import { LevelSwitcher } from '../components/LevelSwitcher'
-import { MentorLink, useMentor } from '../components/MentorLink'
+import { MentorSection, useMentor } from '../components/MentorLink'
+import { store } from '../data'
+import { useAuth } from '../state/auth'
+import { LatestPosts } from './Blog'
 import { formatMinutes, LevelBadge, ProgressBar, ProgressRing, Reveal } from '../components/ui'
 import { CAREER_SECTIONS, getLevel, levelLessons, levelModules } from '../lib/content'
 import { Icon } from '../lib/icons'
@@ -34,6 +37,7 @@ export function Dashboard() {
   const { content } = useContent()
   const { state } = useLearner()
   const mentor = useMentor()
+  const { user } = useAuth()
   const [switchOpen, setSwitchOpen] = useState(false)
   const level = getLevel(content, state.level)!
   const progress = levelProgress(level, state)
@@ -68,6 +72,16 @@ export function Dashboard() {
           </div>
         </div>
       </header>
+
+      {store.mode === 'supabase' && !user && (
+        <div className="callout row-between" style={{ marginBottom: 'var(--space-4)' }} role="note">
+          <span><strong>Save your progress.</strong> Create a free account to keep your lessons, notes and bookmarks on every device.</span>
+          <span className="row">
+            <Link to="/account?mode=signup" className="btn btn-primary btn-sm">Create free account</Link>
+            <Link to="/account" className="btn btn-ghost btn-sm">Sign in</Link>
+          </span>
+        </div>
+      )}
 
       {announcements.map((a) => (
         <div key={a.id} className="callout" style={{ marginBottom: 'var(--space-4)' }} role="status">
@@ -228,29 +242,16 @@ export function Dashboard() {
           </section>
         </Reveal>
 
-        {mentor.available && (
-          <Reveal delay={0.15}>
-            <section aria-labelledby="mentor-title" className="card tinted stack" style={{ height: '100%', '--gap': '12px' } as CSSProperties}>
-              <div className="row" style={{ flexWrap: 'nowrap' }}>
-                {mentor.photo ? <img src={mentor.photo} alt="" className="avatar avatar-lg" /> : <span className="avatar avatar-lg">{mentor.name[0]}</span>}
-                <div>
-                  <h2 id="mentor-title" style={{ fontSize: '1.2rem' }}>1:1 with {mentor.name}</h2>
-                  <span className="subtle">{mentor.role}</span>
-                </div>
-              </div>
-              <p className="muted small">{mentor.bio}</p>
-              <div className="chip-group" aria-label="Session topics">
-                {mentor.topics.slice(0, 5).map((t) => (
-                  <span key={t} className="badge">{t}</span>
-                ))}
-              </div>
-              <div className="row" style={{ marginTop: 'auto' }}>
-                <MentorLink className="btn btn-primary" />
-                {content.reviews?.enabled && <Link to="/reviews" className="btn btn-ghost">Reviews</Link>}
-              </div>
-            </section>
-          </Reveal>
-        )}
+      </div>
+
+      {mentor.enabled && (
+        <div style={{ marginTop: 'var(--space-5)' }}>
+          <MentorSection id="dashboard-mentor" compact />
+        </div>
+      )}
+
+      <div style={{ marginTop: 'var(--space-6)' }}>
+        <LatestPosts />
       </div>
 
       <LevelSwitcher open={switchOpen} onClose={() => setSwitchOpen(false)} />

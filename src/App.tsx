@@ -1,9 +1,9 @@
 import { lazy, Suspense } from 'react'
-import { BrowserRouter, Route, Routes } from 'react-router'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router'
 import { AppShell } from './components/AppShell'
 import { PromoLayer } from './components/Promo'
 import { FullPageLoader } from './components/ui'
-import { AccountPage, NotFound, ProfilePage, SearchPage } from './pages/Account'
+import { AccountPage, NotFound, ProfilePage, ResetPasswordPage, SearchPage } from './pages/Account'
 import { CareerCentre, CareerSectionPage } from './pages/Career'
 import { ChallengePage, ChallengesPage } from './pages/Challenges'
 import { Home } from './pages/Dashboard'
@@ -16,10 +16,18 @@ import { BlogIndex, BlogPostPage } from './pages/Blog'
 import { ProgressPage } from './pages/Progress'
 import { ReviewsPage } from './pages/Reviews'
 import { ResourcesPage } from './pages/Resources'
-import { AuthProvider } from './state/auth'
+import { AuthProvider, useAuth } from './state/auth'
 import { ContentProvider, useContent } from './state/content'
 import { LearnerProvider } from './state/learner'
 import { ThemeProvider, ToastProvider } from './state/ui'
+
+/** If Supabase sends someone back to another page after a reset link, take them to the reset form. */
+function RecoveryRedirect() {
+  const { recovering } = useAuth()
+  const location = useLocation()
+  if (recovering && location.pathname !== '/reset-password') return <Navigate to="/reset-password" replace />
+  return null
+}
 
 // The admin is a separate chunk: students never download it.
 const AdminApp = lazy(() => import('./admin/AdminApp'))
@@ -31,11 +39,13 @@ function Themed() {
       <ToastProvider>
         <AuthProvider>
           <LearnerProvider>
+            <RecoveryRedirect />
             <PromoLayer />
             <Routes>
               <Route path="/welcome" element={<Landing />} />
               <Route path="/start" element={<Onboarding />} />
               <Route path="/account" element={<AccountPage />} />
+              <Route path="/reset-password" element={<ResetPasswordPage />} />
               <Route path="/print/lesson/:lessonId" element={<PrintLesson />} />
               <Route path="/print/module/:levelId/:moduleId" element={<PrintModule />} />
               <Route path="/print/guide/:guideId" element={<PrintGuide />} />

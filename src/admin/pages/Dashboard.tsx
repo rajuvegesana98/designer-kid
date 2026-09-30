@@ -17,12 +17,13 @@ export interface Analytics {
 export function useAnalytics() {
   const [data, setData] = useState<Analytics | null>(null)
   const [error, setError] = useState('')
+  const [tick, setTick] = useState(0)
   useEffect(() => {
     Promise.all([store.listLearners(), store.listEvents(1000), store.listSubmissions()])
       .then(([learners, events, submissions]) => setData({ learners, events, submissions }))
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
-  }, [])
-  return { data, error }
+  }, [tick])
+  return { data, error, reload: () => setTick((t) => t + 1) }
 }
 
 const DAY = 86_400_000

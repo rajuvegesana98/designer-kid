@@ -1,7 +1,9 @@
-import { Download, ExternalLink, Search } from 'lucide-react'
+import { Ban, Download, ExternalLink, Mail, RotateCcw, Search, ShieldCheck, UserCheck } from 'lucide-react'
 import { useMemo, useState, type CSSProperties } from 'react'
 import { useSearchParams } from 'react-router'
-import { EmptyState, formatDate, Modal, PageHeader, ProgressBar, Spinner, Tabs, timeAgo } from '../../components/ui'
+import { ConfirmDialog, EmptyState, formatDate, Modal, PageHeader, ProgressBar, Spinner, Tabs, timeAgo } from '../../components/ui'
+import { useAuth } from '../../state/auth'
+import { useToast } from '../../state/ui'
 import type { LevelId } from '../../content/types'
 import { store, type LearnerRow } from '../../data'
 import { levelProgress } from '../../lib/progress'
@@ -13,12 +15,12 @@ type Sort = 'recent' | 'progress' | 'name' | 'joined'
 
 export function UsersPage() {
   const { draft } = useAdmin()
-  const { data, error } = useAnalytics()
+  const { data, error, reload } = useAnalytics()
   const [params, setParams] = useSearchParams()
   const tab = (params.get('tab') as Tab) || 'learners'
   const [q, setQ] = useState('')
   const [level, setLevel] = useState<LevelId | 'any'>('any')
-  const [activity, setActivity] = useState<'any' | 'active' | 'inactive'>('any')
+  const [activity, setActivity] = useState<'any' | 'active' | 'inactive' | 'suspended' | 'admins'>('any')
   const [sort, setSort] = useState<Sort>('recent')
   const [open, setOpen] = useState<LearnerRow | null>(null)
 
@@ -39,7 +41,8 @@ export function UsersPage() {
       })
       .filter(({ l, active }) => {
         const text = `${l.name} ${l.email}`.toLowerCase()
-        return text.includes(q.toLowerCase()) && (level === 'any' || l.level === level) && (activity === 'any' || (activity === 'active') === active)
+        const actOk = activity === 'any' ? true : activity === 'suspended' ? l.blocked : activity === 'admins' ? l.isAdmin : (activity === 'active') === active
+        return text.includes(q.toLowerCase()) && (level === 'any' || l.level === level) && actOk
       })
       .sort((a, b) =>
         sort === 'name' ? a.l.name.localeCompare(b.l.name) : sort === 'progress' ? (b.p?.pct ?? 0) - (a.p?.pct ?? 0) : sort === 'joined' ? b.l.createdAt.localeCompare(a.l.createdAt) : b.l.lastActiveAt.localeCompare(a.l.lastActiveAt),
@@ -82,6 +85,8 @@ export function UsersPage() {
                 <option value="any">Any activity</option>
                 <option value="active">Active (7 days)</option>
                 <option value="inactive">Inactive</option>
+                <option value="suspended">Suspended</option>
+                <option value="admins">Admins</option>
               </select>
               <select className="select" style={{ width: 'auto' }} aria-label="Sort by" value={sort} onChange={(e) => setSort(e.target.value as Sort)}>
                 <option value="recent">Recently active</option>
@@ -114,7 +119,7 @@ export function UsersPage() {
                       <tr key={l.id}>
                         <td>
                           <button className="btn btn-ghost btn-sm" style={{ padding: 0, height: 'auto', minHeight: 0, textAlign: 'left', display: 'block' }} onClick={() => setOpen(l)}>
-                            <strong style={{ display: 'block' }}>{l.name || '—'}</strong>
+                            <strong style={{ display: 'block' }}>{l.name || '—'} {l.isAdmin && <span className="badge badge-primary">Admin</span>} {l.blocked && <span className="badge badge-danger">Suspended</span>}</strong>
                             <span className="subtle" style={{ fontWeight: 400 }}>{l.email}</span>
                           </button>
                         </td>
@@ -159,14 +164,42 @@ export function UsersPage() {
       </div>
 
       <Modal open={!!open} onClose={() => setOpen(null)} title={open?.name || 'Learner'} description={open?.email} wide>
-        {open && <LearnerDetail learner={open} bookings={bookingByUser.get(open.name) ?? 0} />}
+        {open && (
+          <LearnerDetail
+            learner={open}
+            bookings={bookingByUser.get(open.name) ?? 0}
+            onChanged={(patch) => {
+              setOpen((o) => (o ? { ...o, ...patch } : o))
+              reload()
+            }}
+          />
+        )}
       </Modal>
     </>
   )
 }
 
-function LearnerDetail({ learner, bookings }: { learner: LearnerRow; bookings: number }) {
+function LearnerDetail({ learner, bookings, onChanged }: { learner: LearnerRow; bookings: number; onChanged: (patch: Partial<LearnerRow>) => void }) {
   const { draft } = useAdmin()
+  const { user } = useAuth()
+  const toast = useToast()
+  const [name, setName] = useState(learner.name)
+  const [confirm, setConfirm] = useState<null | 'reset' | 'suspend' | 'admin'>(null)
+  const [busy, setBusy] = useState(false)
+  const run = async (fn: () => Promise<void>, msg: string, patch: Partial<LearnerRow> = {}) => {
+    setBusy(true)
+    try {
+      await fn()
+      toast(msg)
+      onChanged(patch)
+    } catch (e) {
+      toast(e instanceof Error ? e.message : 'Action failed', 'error')
+    } finally {
+      setBusy(false)
+      setConfirm(null)
+    }
+  }
+  const isSelf = user?.id === learner.id
   const s = learner.state
   const lv = draft.levels.find((l) => l.id === learner.level)
   const p = lv && s?.completedLessons ? levelProgress(lv, s) : null
@@ -189,6 +222,69 @@ function LearnerDetail({ learner, bookings }: { learner: LearnerRow; bookings: n
           </div>
         ))}
       </div>
+      <section className="card card-flat stack" aria-label="Manage learner">
+        <strong>Manage</strong>
+        <div className="grid grid-2">
+          <div className="field">
+            <label htmlFor="learner-name">Name</label>
+            <div className="row" style={{ flexWrap: 'nowrap' }}>
+              <input id="learner-name" className="input" value={name} onChange={(e) => setName(e.target.value)} />
+              <button className="btn btn-sm" disabled={busy || name.trim() === learner.name} onClick={() => run(() => store.updateLearnerProfile(learner.id, { name: name.trim() }), 'Name updated', { name: name.trim() })}>Save</button>
+            </div>
+          </div>
+          <div className="field">
+            <label htmlFor="learner-level">Level</label>
+            <select id="learner-level" className="select" value={learner.level ?? ''} disabled={busy} onChange={(e) => run(() => store.updateLearnerProfile(learner.id, { level: (e.target.value || null) as LevelId | null }), 'Level updated', { level: (e.target.value || null) as LevelId | null })}>
+              <option value="">Not chosen</option>
+              {draft.levels.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+            </select>
+          </div>
+        </div>
+        <div className="row">
+          {store.mode === 'supabase' && learner.email.includes('@') && (
+            <button className="btn btn-sm" disabled={busy} onClick={() => run(() => store.requestPasswordReset(learner.email), `Password reset email sent to ${learner.email}`)}>
+              <Mail size={15} aria-hidden /> Send password reset
+            </button>
+          )}
+          <button className="btn btn-sm" disabled={busy} onClick={() => setConfirm('reset')}><RotateCcw size={15} aria-hidden /> Reset progress</button>
+          {!isSelf && (
+            <button className="btn btn-sm" disabled={busy} onClick={() => setConfirm('suspend')} style={{ color: learner.blocked ? undefined : 'var(--c-danger)' }}>
+              {learner.blocked ? <><UserCheck size={15} aria-hidden /> Restore account</> : <><Ban size={15} aria-hidden /> Suspend account</>}
+            </button>
+          )}
+          {store.mode === 'supabase' && !isSelf && (
+            <button className="btn btn-sm" disabled={busy} onClick={() => setConfirm('admin')}>
+              <ShieldCheck size={15} aria-hidden /> {learner.isAdmin ? 'Remove admin' : 'Make admin'}
+            </button>
+          )}
+        </div>
+        {store.mode === 'supabase' && (
+          <p className="subtle">To permanently delete an account and its login, use Supabase → Authentication → Users. Suspending keeps their data but blocks sign-in.</p>
+        )}
+      </section>
+      <ConfirmDialog
+        open={!!confirm}
+        danger={confirm !== 'admin' || learner.isAdmin}
+        title={confirm === 'reset' ? 'Reset this learner’s progress?' : confirm === 'suspend' ? (learner.blocked ? 'Restore this account?' : 'Suspend this account?') : learner.isAdmin ? 'Remove admin access?' : 'Give admin access?'}
+        body={
+          confirm === 'reset'
+            ? 'Completed lessons, challenges, checklists, notes and bookmarks will be cleared. This can’t be undone.'
+            : confirm === 'suspend'
+              ? learner.blocked
+                ? 'They’ll be able to sign in and learn again.'
+                : 'They’ll be signed out and unable to sign in, write reviews or submit challenges. Their data is kept.'
+              : learner.isAdmin
+                ? 'They will no longer be able to open the admin dashboard.'
+                : 'They will be able to edit and publish everything on Designer Kid. Only do this for people you trust.'
+        }
+        confirmLabel={confirm === 'reset' ? 'Reset progress' : confirm === 'suspend' ? (learner.blocked ? 'Restore' : 'Suspend') : learner.isAdmin ? 'Remove admin' : 'Make admin'}
+        onCancel={() => setConfirm(null)}
+        onConfirm={() => {
+          if (confirm === 'reset') void run(() => store.resetLearnerProgress(learner.id), 'Progress reset')
+          else if (confirm === 'suspend') void run(() => store.updateLearnerProfile(learner.id, { blocked: !learner.blocked }), learner.blocked ? 'Account restored' : 'Account suspended', { blocked: !learner.blocked })
+          else void run(() => store.setAdmin(learner.id, !learner.isAdmin), learner.isAdmin ? 'Admin access removed' : 'Admin access granted', { isAdmin: !learner.isAdmin })
+        }}
+      />
       {lv && (
         <div>
           <strong className="small">Modules</strong>

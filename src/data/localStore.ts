@@ -85,6 +85,12 @@ export function createLocalStore(): DataStore {
       localStorage.removeItem(KEYS.admin)
       emit(null)
     },
+    async requestPasswordReset() {
+      throw new Error('Password reset needs Supabase to be connected.')
+    },
+    async updatePassword() {
+      throw new Error('Passwords need Supabase to be connected.')
+    },
     async enterDemoAdmin() {
       write(KEYS.admin, true)
       emit(DEMO_ADMIN)
@@ -148,8 +154,23 @@ export function createLocalStore(): DataStore {
           state,
           createdAt: state.activeDays[0] ?? state.updatedAt,
           lastActiveAt: state.updatedAt,
+          blocked: false,
+          isAdmin: false,
         },
       ]
+    },
+    async updateLearnerProfile(id, patch) {
+      const state = read<LearnerState | null>(KEYS.learner(id), null)
+      if (!state) return
+      write(KEYS.learner(id), { ...state, ...(patch.name !== undefined ? { name: patch.name } : {}), ...(patch.level !== undefined ? { level: patch.level } : {}) })
+    },
+    async resetLearnerProgress(id) {
+      const state = read<LearnerState | null>(KEYS.learner(id), null)
+      if (!state) return
+      write(KEYS.learner(id), { ...state, completedLessons: {}, completedChallenges: {}, careerChecks: {}, bookmarks: [], notes: {}, activeDays: [], challengeWork: {}, lastLesson: undefined })
+    },
+    async setAdmin() {
+      throw new Error('Managing admins needs Supabase to be connected.')
     },
     async listEvents(limit) {
       return read<ActivityEvent[]>(KEYS.events, []).slice(0, limit)

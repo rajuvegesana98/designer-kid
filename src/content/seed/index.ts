@@ -8,6 +8,7 @@ import { achievements, careerGuides, challenges, resources } from './library'
 import { interviewGuides } from './careerInterviews'
 import { profileGuides } from './careerProfiles'
 import { blogPosts } from './blog'
+import { designPosts } from './blogDesign'
 
 const levels: Level[] = [
   {
@@ -194,5 +195,5 @@ export const seedContent: SiteContent = {
       version: 1,
     },
   ],
-  blog: blogPosts,
+  blog: [...blogPosts, ...designPosts],
 }

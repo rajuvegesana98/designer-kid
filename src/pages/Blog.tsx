@@ -167,3 +167,25 @@ export function BlogPostPage() {
     </div>
   )
 }
+
+/** "From the blog" strip for the homepage and dashboard. */
+export function LatestPosts({ title = 'From the blog', count = 3 }: { title?: string; count?: number }) {
+  const { content } = useContent()
+  const posts = sortPosts(content.blog ?? []).slice(0, count)
+  if (!posts.length) return null
+  return (
+    <section aria-labelledby="latest-posts-title">
+      <div className="row-between" style={{ marginBottom: 'var(--space-4)' }}>
+        <h2 id="latest-posts-title" style={{ fontSize: '1.35rem' }}>{title}</h2>
+        <Link to="/blog" className="btn btn-ghost btn-sm">All articles <ArrowRight size={15} aria-hidden /></Link>
+      </div>
+      <div className="grid grid-3">
+        {posts.map((p, i) => (
+          <Reveal key={p.id} delay={i * 0.05}>
+            <BlogCard post={p} />
+          </Reveal>
+        ))}
+      </div>
+    </section>
+  )
+}

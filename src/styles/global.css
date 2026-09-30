@@ -1110,3 +1110,5 @@ h1.inline-editable, h3.inline-editable { margin: 0 0 8px; }
 .preset-swatches { display: flex; gap: 4px; }
 .preset-swatches span { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--c-line); }
 .favicon-tab { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px 10px 0 0; background: var(--c-surface-3); font-size: 0.8rem; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: fit-content; }
+.mentor-panel-grid { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: var(--space-5); align-items: start; }
+@media (max-width: 640px) { .mentor-panel-grid { grid-template-columns: minmax(0, 1fr); } }

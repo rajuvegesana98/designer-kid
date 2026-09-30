@@ -15,7 +15,7 @@ import { useColorMode, useToast, type ModePref } from '../state/ui'
 export function ProfilePage() {
   const { content } = useContent()
   const { state, setName, resetProgress } = useLearner()
-  const { user, mode, signOut } = useAuth()
+  const { user, mode, signOut, updatePassword } = useAuth()
   const { pref, setPref } = useColorMode()
   const toast = useToast()
   const [name, setNameInput] = useState(state.name)
@@ -81,6 +81,13 @@ export function ProfilePage() {
           {user?.isAdmin && <Link to="/admin" className="btn btn-soft" style={{ width: 'fit-content' }}>Open admin dashboard</Link>}
         </section>
 
+        {user && mode === 'supabase' && (
+          <section className="card stack" aria-labelledby="p-password">
+            <h2 id="p-password" style={{ fontSize: '1.15rem' }}>Change password</h2>
+            <PasswordFields submitLabel="Update password" onDone={async (pw) => { await updatePassword(pw); toast('Password updated') }} />
+          </section>
+        )}
+
         <section className="card stack" aria-labelledby="p-appearance">
           <h2 id="p-appearance" style={{ fontSize: '1.15rem' }}>Appearance</h2>
           <div className="chip-group" role="radiogroup" aria-labelledby="p-appearance">
@@ -125,10 +132,11 @@ export function ProfilePage() {
 }
 
 export function AccountPage() {
-  const { signIn, signUp, mode, user } = useAuth()
+  const { signIn, signUp, mode, user, requestPasswordReset, suspended } = useAuth()
   const { state } = useLearner()
   const [params] = useSearchParams()
   const [tab, setTab] = useState<'signin' | 'signup'>(params.get('mode') === 'signup' ? 'signup' : 'signin')
+  const [forgot, setForgot] = useState(false)
   const [name, setName] = useState(state.name)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -142,6 +150,22 @@ export function AccountPage() {
   useEffect(() => {
     if (user) navigate(next, { replace: true })
   }, [user, next, navigate])
+
+  const sendReset = async (e: FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setInfo('')
+    if (!email.includes('@')) return setError('Enter the email you signed up with.')
+    setBusy(true)
+    try {
+      await requestPasswordReset(email.trim())
+      setInfo('If an account exists for that email, a reset link is on its way. Check your inbox (and spam).')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not send the email. Please try again later.')
+    } finally {
+      setBusy(false)
+    }
+  }
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -171,11 +195,27 @@ export function AccountPage() {
       </header>
       <main id="main" className="page" style={{ maxWidth: 480 }}>
         <div className="card stack" style={{ padding: 'var(--space-6)' }}>
-          <h1 style={{ fontSize: '1.8rem' }}>{tab === 'signin' ? 'Welcome back' : 'Create your account'}</h1>
+          <h1 style={{ fontSize: '1.8rem' }}>{forgot ? 'Reset your password' : tab === 'signin' ? 'Welcome back' : 'Create your free account'}</h1>
+          {!forgot && tab === 'signup' && mode === 'supabase' && <p className="muted small">Save your progress, notes and bookmarks and pick up on any device.</p>}
           {mode === 'local' ? (
             <p className="muted">Accounts aren’t switched on yet. You can keep learning — your progress is saved in this browser.</p>
           ) : (
             <>
+              {suspended && <p className="callout callout-warning small" role="alert">This account has been suspended. Please contact Designer Kid if you think this is a mistake.</p>}
+              {forgot ? (
+                <form className="stack" onSubmit={sendReset} noValidate>
+                  <p className="muted">Enter the email you signed up with and we’ll send you a link to choose a new password.</p>
+                  <div className="field">
+                    <label htmlFor={ids.email}>Email</label>
+                    <input id={ids.email} className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" required />
+                  </div>
+                  {error && <p className="error" role="alert" style={{ color: 'var(--c-danger)', fontWeight: 500 }}>{error}</p>}
+                  {info && <p role="status" className="callout callout-tip">{info}</p>}
+                  <button className="btn btn-primary btn-lg" type="submit" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button>
+                  <button type="button" className="btn btn-ghost" onClick={() => { setForgot(false); setError(''); setInfo('') }}>Back to sign in</button>
+                </form>
+              ) : (
+              <>
               <Tabs<'signin' | 'signup'>
                 id="auth"
                 label="Account"
@@ -206,12 +246,98 @@ export function AccountPage() {
                   <input id={ids.password} className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={tab === 'signin' ? 'current-password' : 'new-password'} required minLength={8} aria-describedby={`${ids.password}-hint`} />
                   {tab === 'signup' && <span id={`${ids.password}-hint`} className="hint">At least 8 characters.</span>}
                 </div>
+                {tab === 'signin' && (
+                  <button type="button" className="btn btn-ghost btn-sm" style={{ alignSelf: 'flex-end', marginTop: -6 }} onClick={() => { setForgot(true); setError(''); setInfo('') }}>
+                    Forgot password?
+                  </button>
+                )}
                 {error && <p className="error" role="alert" style={{ color: 'var(--c-danger)', fontWeight: 500 }}>{error}</p>}
                 {info && <p role="status" className="callout callout-tip">{info}</p>}
                 <button className="btn btn-primary btn-lg" type="submit" disabled={busy}>
                   {busy ? 'Please wait…' : tab === 'signin' ? 'Sign in' : 'Create account'}
                 </button>
               </form>
+              </>
+              )}
+            </>
+          )}
+        </div>
+      </main>
+    </div>
+  )
+}
+
+function PasswordFields({ onDone, submitLabel }: { onDone: (password: string) => Promise<void>; submitLabel: string }) {
+  const [pw, setPw] = useState('')
+  const [pw2, setPw2] = useState('')
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+  const ids = { a: useId(), b: useId() }
+  const submit = async (e: FormEvent) => {
+    e.preventDefault()
+    setError('')
+    if (pw.length < 8) return setError('Use at least 8 characters.')
+    if (pw !== pw2) return setError('The two passwords don’t match.')
+    setBusy(true)
+    try {
+      await onDone(pw)
+      setPw('')
+      setPw2('')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not update the password.')
+    } finally {
+      setBusy(false)
+    }
+  }
+  return (
+    <form className="stack" onSubmit={submit} noValidate>
+      <div className="field">
+        <label htmlFor={ids.a}>New password</label>
+        <input id={ids.a} className="input" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} minLength={8} required />
+        <span className="hint">At least 8 characters.</span>
+      </div>
+      <div className="field">
+        <label htmlFor={ids.b}>Confirm new password</label>
+        <input id={ids.b} className="input" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} required />
+      </div>
+      {error && <p role="alert" style={{ color: 'var(--c-danger)', fontWeight: 500 }}>{error}</p>}
+      <button className="btn btn-primary" disabled={busy} style={{ width: 'fit-content' }}>{busy ? 'Saving…' : submitLabel}</button>
+    </form>
+  )
+}
+
+export function ResetPasswordPage() {
+  const { user, ready, updatePassword, recovering } = useAuth()
+  const navigate = useNavigate()
+  const toast = useToast()
+  const [waited, setWaited] = useState(false)
+  useEffect(() => {
+    const t = window.setTimeout(() => setWaited(true), 2500)
+    return () => window.clearTimeout(t)
+  }, [])
+  return (
+    <div className="canvas-bg" style={{ minHeight: '100dvh' }}>
+      <header className="page row-between" style={{ paddingTop: 20, paddingBottom: 0 }}>
+        <Brand />
+      </header>
+      <main id="main" className="page" style={{ maxWidth: 480 }}>
+        <div className="card stack" style={{ padding: 'var(--space-6)' }}>
+          <h1 style={{ fontSize: '1.8rem' }}>Choose a new password</h1>
+          {user && (recovering || waited) ? (
+            <PasswordFields
+              submitLabel="Save new password"
+              onDone={async (pw) => {
+                await updatePassword(pw)
+                toast('Password updated — you’re signed in')
+                navigate('/', { replace: true })
+              }}
+            />
+          ) : !ready || !waited ? (
+            <p className="muted">Checking your reset link…</p>
+          ) : (
+            <>
+              <p className="muted">This reset link has expired or was already used. Request a new one and open it on the same day.</p>
+              <Link to="/account" className="btn btn-primary" style={{ width: 'fit-content' }}>Request a new link</Link>
             </>
           )}
         </div>

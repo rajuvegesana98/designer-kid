@@ -14,6 +14,7 @@ import { moduleLock, moduleProgress } from '../lib/progress'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 import { useToast } from '../state/ui'
+import { usePageTitle } from '../lib/usePageTitle'
 
 const SECTIONS = [
   { id: 'learn', label: 'Learn' },
@@ -81,6 +82,7 @@ export function LessonPage() {
   const toast = useToast()
   const mentor = useMentor()
   const ref = findLesson(content, lessonId ?? '')
+  usePageTitle(ref?.lesson.title)
   const active = useActiveSection(SECTION_IDS, lessonId ?? '')
   const [practiceChecks, setPracticeChecks] = useState<Record<number, boolean>>({})
   const [justCompleted, setJustCompleted] = useState(false)

@@ -8,6 +8,7 @@ import { Icon } from '../lib/icons'
 import { levelProgress, moduleLock, moduleProgress, nextLesson } from '../lib/progress'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
+import { usePageTitle } from '../lib/usePageTitle'
 
 export function LearnIndex() {
   const { state } = useLearner()
@@ -34,6 +35,7 @@ export function LevelRoadmap() {
   const { content } = useContent()
   const { state } = useLearner()
   const level = getLevel(content, levelId as LevelId)
+  usePageTitle(level ? `${level.name} roadmap` : 'Learn')
   if (!level) return <NotFoundLevel />
   const isMine = state.level === level.id
   const progress = levelProgress(level, state)

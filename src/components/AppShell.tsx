@@ -112,6 +112,8 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     window.scrollTo({ top: 0 })
     setMoreOpen(false)
+    // Move focus to the new page so keyboard and screen-reader users start at its content.
+    document.getElementById('main')?.focus({ preventScroll: true })
   }, [location.pathname])
 
   const nav = content.navigation

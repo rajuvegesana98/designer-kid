@@ -246,7 +246,6 @@ export function Tabs<T extends string>({
           role="tab"
           className="tab"
           aria-selected={value === t.value}
-          aria-controls={`${id}-panel`}
           tabIndex={value === t.value ? 0 : -1}
           onClick={() => onChange(t.value)}
           onKeyDown={(e) => onKey(e, i)}

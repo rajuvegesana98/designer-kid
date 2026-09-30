@@ -39,6 +39,8 @@ jobs:
         env:
           # Serve from /<repo>/ on github.io, or / on a custom domain.
           BASE_PATH: ${{ steps.pages.outputs.base_path }}/
+          # Public site root for canonical/Open Graph tags, robots.txt and sitemap.xml.
+          SITE_URL: ${{ steps.pages.outputs.base_url }}
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
       - uses: actions/upload-pages-artifact@v3

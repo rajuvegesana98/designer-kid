@@ -11,6 +11,7 @@ import { inline } from '../lib/markdown'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 import { useToast } from '../state/ui'
+import { usePageTitle } from '../lib/usePageTitle'
 
 export const CATEGORIES: ChallengeCategory[] = ['UI', 'UX', 'Figma', 'UX research', 'Design system', 'Product thinking', 'Portfolio']
 const CATEGORY_ICON: Record<ChallengeCategory, string> = {
@@ -122,6 +123,7 @@ export function ChallengePage() {
   const mentor = useMentor()
   const toast = useToast()
   const c = content.challenges.find((x) => x.id === challengeId)
+  usePageTitle(c?.title ?? 'Challenge')
   const work = c ? state.challengeWork[c.id] : undefined
   const [link, setLink] = useState(work?.link ?? '')
   const [notes, setNotes] = useState(work?.notes ?? '')

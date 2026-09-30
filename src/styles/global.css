@@ -44,7 +44,7 @@
   --c-success: var(--c-accent);
   --c-danger: #d12f45;
   --c-danger-soft: color-mix(in oklab, var(--c-danger) 11%, var(--c-surface));
-  --c-warning: #b76e00;
+  --c-warning: #8f5600;
   --c-warning-soft: color-mix(in oklab, #f59f00 16%, var(--c-surface));
   --c-focus: var(--c-primary);
   --c-level: var(--c-primary);

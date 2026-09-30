@@ -21,16 +21,36 @@ export async function loadSeed(): Promise<SiteContent> {
   return structuredClone(mod.seedContent)
 }
 
-/** Older saved content may predate newer settings; fill any missing top-level sections from the defaults. */
+/**
+ * Older saved content may predate newer settings; fill any missing top-level
+ * sections. Small sections come from lightweight defaults and the blog from its
+ * own chunk, so a live site doesn't download the whole starter content just to
+ * backfill them. Also puts "Blog" in the menu if the menu has no /blog item
+ * (admins can hide it with the menu item's Visible switch).
+ */
 export async function withDefaults(content: SiteContent | null): Promise<SiteContent | null> {
   if (!content) return null
-  const keys: (keyof SiteContent)[] = ['brand', 'theme', 'home', 'navigation', 'footer', 'mentor', 'reviews', 'notifications', 'levels', 'challenges', 'resources', 'careerGuides', 'announcements', 'achievements', 'promos', 'blog']
-  const missing = keys.filter((k) => content[k] === undefined)
-  if (!missing.length) return content
-  const seed = await loadSeed()
-  const merged = { ...content } as Record<string, unknown>
-  for (const k of missing) merged[k] = seed[k]
-  return merged as unknown as SiteContent
+  const merged = { ...content } as SiteContent
+  const small = await import('../content/defaults')
+  if (merged.reviews === undefined) merged.reviews = structuredClone(small.defaultReviews)
+  if (merged.notifications === undefined) merged.notifications = structuredClone(small.defaultNotifications)
+  if (merged.promos === undefined) merged.promos = structuredClone(small.defaultPromos)
+  if (merged.blog === undefined) {
+    const [a, b] = await Promise.all([import('../content/seed/blog'), import('../content/seed/blogDesign')])
+    merged.blog = structuredClone([...a.blogPosts, ...b.designPosts])
+  }
+  const heavy: (keyof SiteContent)[] = ['brand', 'theme', 'home', 'navigation', 'footer', 'mentor', 'levels', 'challenges', 'resources', 'careerGuides', 'announcements', 'achievements']
+  const missing = heavy.filter((k) => merged[k] === undefined)
+  if (missing.length) {
+    const seed = await loadSeed()
+    for (const k of missing) (merged as unknown as Record<string, unknown>)[k] = seed[k]
+  }
+  if (merged.blog.length && Array.isArray(merged.navigation) && !merged.navigation.some((n) => n.path === '/blog')) {
+    const i = merged.navigation.findIndex((n) => n.id === 'reviews')
+    const item = { id: 'blog', label: 'Blog', path: '/blog', visible: true }
+    merged.navigation = i >= 0 ? [...merged.navigation.slice(0, i), item, ...merged.navigation.slice(i)] : [...merged.navigation, item]
+  }
+  return merged
 }
 
 function readPreview(): SiteContent | null {

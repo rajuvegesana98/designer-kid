@@ -9,6 +9,7 @@ import { useAuth } from '../state/auth'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 import { useToast } from '../state/ui'
+import { usePageTitle } from '../lib/usePageTitle'
 
 export function Stars({ value, size = 16, label }: { value: number; size?: number; label?: string }) {
   return (
@@ -183,6 +184,7 @@ export function ReviewsPage() {
       </div>
     )
   const avg = reviews ? average(reviews) : 0
+  usePageTitle('Reviews')
   return (
     <div className="page">
       <PageHeader eyebrow="Reviews" title={settings.title} actions={mentor.available && <MentorLink className="btn" />}>

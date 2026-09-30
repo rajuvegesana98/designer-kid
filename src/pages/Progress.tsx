@@ -10,12 +10,14 @@ import { Icon } from '../lib/icons'
 import { achievementUnlocked, careerSectionProgress, levelProgress, longestStreak, moduleProgress, streak } from '../lib/progress'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
+import { usePageTitle } from '../lib/usePageTitle'
 
 type Tab = 'overview' | 'achievements' | 'bookmarks' | 'notes'
 
 export function ProgressPage() {
   const [params, setParams] = useSearchParams()
   const tab = (params.get('tab') as Tab) || 'overview'
+  usePageTitle('My Progress')
   return (
     <div className="page">
       <PageHeader eyebrow="My Progress" title="How you’re doing">

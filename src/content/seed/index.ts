@@ -1,3 +1,4 @@
+import { defaultNotifications, defaultPromos, defaultReviews } from '../defaults'
 import type { Level, SiteContent } from '../types'
 import { beginnerFoundations } from './beginnerFoundations'
 import { beginnerLaunch } from './beginnerLaunch'
@@ -144,20 +145,8 @@ export const seedContent: SiteContent = {
     topics: ['Portfolio review', 'Resume review', 'LinkedIn review', 'Career guidance', 'UI/UX doubts', 'Figma help', 'Interview preparation', 'Project feedback', 'General mentorship'],
     enabled: true,
   },
-  reviews: {
-    enabled: true,
-    requireApproval: true,
-    showOnHome: true,
-    title: 'What learners say about Harikrishna',
-    prompt: 'Had a session with Harikrishna or learned with Designer Kid? Share an honest review to help other learners.',
-  },
-  notifications: {
-    newLesson: true,
-    newChallenge: true,
-    courseCompletion: true,
-    announcements: true,
-    careerUpdates: true,
-  },
+  reviews: defaultReviews,
+  notifications: defaultNotifications,
   levels,
   challenges,
   resources,
@@ -175,25 +164,6 @@ export const seedContent: SiteContent = {
     },
   ],
   achievements,
-  promos: [
-    {
-      id: 'promo-welcome',
-      enabled: false,
-      style: 'popup',
-      title: 'Free portfolio review week',
-      message: 'Book a 1:1 this week and get honest, practical feedback on one case study.',
-      ctaLabel: 'Book a session',
-      ctaUrl: '/career/portfolio',
-      image: '',
-      illustration: 'portfolio',
-      tone: 'primary',
-      startsAt: '',
-      endsAt: '',
-      audience: 'everyone',
-      pages: 'all',
-      dismissible: true,
-      version: 1,
-    },
-  ],
+  promos: defaultPromos,
   blog: [...blogPosts, ...designPosts],
 }

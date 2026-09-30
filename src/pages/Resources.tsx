@@ -6,6 +6,7 @@ import { EmptyState, LevelBadge, PageHeader, Reveal } from '../components/ui'
 import type { LevelId, ResourceType } from '../content/types'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
+import { usePageTitle } from '../lib/usePageTitle'
 
 const TYPES: ResourceType[] = ['Article', 'Tool', 'Template', 'Video', 'Book', 'Community', 'Course']
 
@@ -15,6 +16,7 @@ export function ResourcesPage() {
   const [level, setLevel] = useState<LevelId | 'any'>(state.level ?? 'any')
   const [type, setType] = useState<ResourceType | null>(null)
   const available = TYPES.filter((t) => content.resources.some((r) => r.type === t))
+  usePageTitle('Resources')
   const list = content.resources.filter((r) => (level === 'any' || r.level === level || r.level === 'all') && (!type || r.type === type))
 
   return (

@@ -12,6 +12,7 @@ import { careerSectionProgress } from '../lib/progress'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 import { useToast } from '../state/ui'
+import { usePageTitle } from '../lib/usePageTitle'
 
 export function CareerCentre() {
   const { content } = useContent()
@@ -109,6 +110,7 @@ export function CareerSectionPage() {
   const { content } = useContent()
   const { state, toggleCareerCheck } = useLearner()
   const meta = CAREER_SECTIONS.find((s) => s.id === section)
+  usePageTitle(meta ? `${meta.title} · Career Centre` : 'Career Centre')
   const [showAll, setShowAll] = useState(false)
   if (!meta) return <Navigate to="/career" replace />
   const mine = guidesFor(content, meta.id, state.level)

@@ -87,7 +87,8 @@ export function themeVars(theme: Theme, mode: 'light' | 'dark'): Record<string, 
   return vars
 }
 
-const loadedFonts = new Set<string>()
+// index.html already loads the default pair; only fetch fonts chosen later in the theme editor.
+const loadedFonts = new Set<string>(['Bricolage Grotesque', 'Instrument Sans'])
 
 /** Loads Google Fonts on demand so the theme editor can offer any font in FONT_OPTIONS. */
 export function ensureFonts(families: string[]) {

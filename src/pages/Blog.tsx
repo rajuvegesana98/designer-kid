@@ -8,6 +8,7 @@ import { EmptyState, formatDate, PageHeader, Reveal } from '../components/ui'
 import type { BlogPost } from '../content/types'
 import { useContent } from '../state/content'
 import { useToast } from '../state/ui'
+import { usePageTitle } from '../lib/usePageTitle'
 
 export function sortPosts(posts: BlogPost[]) {
   return [...posts].sort((a, b) => b.date.localeCompare(a.date))
@@ -47,6 +48,7 @@ export function BlogIndex() {
   const tags = [...new Set(posts.flatMap((p) => p.tags))].sort()
   const filtered = posts.filter((p) => (!tag || p.tags.includes(tag)) && `${p.title} ${p.excerpt} ${p.tags.join(' ')}`.toLowerCase().includes(q.toLowerCase()))
   const featured = !tag && !q ? filtered.find((p) => p.featured) : undefined
+  usePageTitle('Blog')
   const rest = filtered.filter((p) => p !== featured)
 
   return (
@@ -92,6 +94,7 @@ export function BlogPostPage() {
   const toast = useToast()
   const posts = sortPosts(content.blog ?? [])
   const post = posts.find((p) => p.slug === slug)
+  usePageTitle(post?.title)
   if (!post)
     return (
       <div className="page">

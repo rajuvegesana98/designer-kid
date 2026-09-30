@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router'
 import { AppShell } from './components/AppShell'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { PromoLayer } from './components/Promo'
 import { FullPageLoader } from './components/ui'
 import { AccountPage, NotFound, ProfilePage, ResetPasswordPage, SearchPage } from './pages/Account'
@@ -87,10 +88,12 @@ function Themed() {
 
 export default function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-      <ContentProvider fallback={<FullPageLoader />}>
-        <Themed />
-      </ContentProvider>
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+        <ContentProvider fallback={<FullPageLoader />}>
+          <Themed />
+        </ContentProvider>
+      </BrowserRouter>
+    </ErrorBoundary>
   )
 }

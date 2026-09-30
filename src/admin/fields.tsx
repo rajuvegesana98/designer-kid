@@ -5,6 +5,7 @@ import { Modal, Spinner } from '../components/ui'
 import { store, type MediaItem } from '../data'
 import { isHex } from '../lib/theme'
 import { useToast } from '../state/ui'
+import { optimise } from './uploads'
 
 /**
  * Text inputs keep a local value and commit to the draft after a short pause
@@ -156,7 +157,7 @@ export function MediaPicker({ open, onClose, onPick, folder = 'general' }: { ope
     if (!file) return
     setUploading(true)
     try {
-      const item = await store.uploadMedia(file, folder)
+      const item = await store.uploadMedia(await optimise(file), folder)
       onPick(item.url)
       onClose()
     } catch (err) {

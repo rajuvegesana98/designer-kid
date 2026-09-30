@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
-import { Check, X } from 'lucide-react'
-import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react'
+import { Check, Eye, EyeOff, X } from 'lucide-react'
+import { useEffect, useId, useRef, useState, type CSSProperties, type InputHTMLAttributes, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { Level } from '../content/types'
 import { Icon } from '../lib/icons'
@@ -369,4 +369,23 @@ export function timeAgo(iso: string) {
   if (s < 86400) return `${Math.floor(s / 3600)} h ago`
   if (s < 86400 * 7) return `${Math.floor(s / 86400)} d ago`
   return formatDate(iso)
+}
+
+/** Password input with a show/hide toggle (keyboard and screen-reader accessible). */
+export function PasswordInput(props: Omit<InputHTMLAttributes<HTMLInputElement>, 'type'>) {
+  const [visible, setVisible] = useState(false)
+  return (
+    <div className="password-field">
+      <input {...props} type={visible ? 'text' : 'password'} className={`input ${props.className ?? ''}`.replace('input input', 'input')} />
+      <button
+        type="button"
+        className="password-toggle"
+        aria-label={visible ? 'Hide password' : 'Show password'}
+        aria-pressed={visible}
+        onClick={() => setVisible((v) => !v)}
+      >
+        {visible ? <EyeOff size={18} aria-hidden /> : <Eye size={18} aria-hidden />}
+      </button>
+    </div>
+  )
 }

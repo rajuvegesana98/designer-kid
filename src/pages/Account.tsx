@@ -4,7 +4,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Brand } from '../components/Brand'
 import { LevelSwitcher } from '../components/LevelSwitcher'
 import { buildIndex, LevelFilter, ResultRow, searchIndex, type ResultCategory } from '../components/Search'
-import { ConfirmDialog, EmptyState, LevelBadge, PageHeader } from '../components/ui'
+import { ConfirmDialog, EmptyState, LevelBadge, PageHeader, PasswordInput } from '../components/ui'
 import type { LevelId } from '../content/types'
 import { getLevel } from '../lib/content'
 import { useAuth } from '../state/auth'
@@ -257,7 +257,7 @@ export function AccountPage() {
                 </div>
                 <div className="field">
                   <label htmlFor={ids.password}>Password</label>
-                  <input id={ids.password} className="input" type="password" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={tab === 'signin' ? 'current-password' : 'new-password'} required minLength={8} aria-describedby={`${ids.password}-hint`} />
+                  <PasswordInput id={ids.password} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete={tab === 'signin' ? 'current-password' : 'new-password'} required minLength={8} aria-describedby={`${ids.password}-hint`} />
                   {tab === 'signup' && <span id={`${ids.password}-hint`} className="hint">At least 8 characters.</span>}
                 </div>
                 {tab === 'signin' && (
@@ -281,7 +281,7 @@ export function AccountPage() {
   )
 }
 
-function PasswordFields({ onDone, submitLabel }: { onDone: (password: string) => Promise<void>; submitLabel: string }) {
+export function PasswordFields({ onDone, submitLabel }: { onDone: (password: string) => Promise<void>; submitLabel: string }) {
   const [pw, setPw] = useState('')
   const [pw2, setPw2] = useState('')
   const [error, setError] = useState('')
@@ -307,12 +307,12 @@ function PasswordFields({ onDone, submitLabel }: { onDone: (password: string) =>
     <form className="stack" onSubmit={submit} noValidate>
       <div className="field">
         <label htmlFor={ids.a}>New password</label>
-        <input id={ids.a} className="input" type="password" autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} minLength={8} required />
+        <PasswordInput id={ids.a} autoComplete="new-password" value={pw} onChange={(e) => setPw(e.target.value)} minLength={8} required />
         <span className="hint">At least 8 characters.</span>
       </div>
       <div className="field">
         <label htmlFor={ids.b}>Confirm new password</label>
-        <input id={ids.b} className="input" type="password" autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} required />
+        <PasswordInput id={ids.b} autoComplete="new-password" value={pw2} onChange={(e) => setPw2(e.target.value)} required />
       </div>
       {error && <p role="alert" style={{ color: 'var(--c-danger)', fontWeight: 500 }}>{error}</p>}
       <button className="btn btn-primary" disabled={busy} style={{ width: 'fit-content' }}>{busy ? 'Saving…' : submitLabel}</button>

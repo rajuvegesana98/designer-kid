@@ -4,6 +4,8 @@ import { ConfirmDialog, EmptyState, formatDate, PageHeader, Spinner } from '../.
 import type { SiteContent } from '../../content/types'
 import { store, type ContentVersion } from '../../data'
 import { useToast } from '../../state/ui'
+import { useAuth } from '../../state/auth'
+import { PasswordFields } from '../../pages/Account'
 import { FormSection } from '../fields'
 import { diffSections, useAdmin } from '../state'
 
@@ -124,12 +126,40 @@ function BackupSection() {
   )
 }
 
+function AdminAccount() {
+  const { user, updatePassword, requestPasswordReset } = useAuth()
+  const toast = useToast()
+  if (store.mode !== 'supabase' || !user) return null
+  return (
+    <FormSection title="Your admin account" description={`Signed in as ${user.email}.`}>
+      <div className="stack">
+        <strong className="small">Change password</strong>
+        <PasswordFields submitLabel="Update password" onDone={async (pw) => { await updatePassword(pw); toast('Password updated') }} />
+      </div>
+      <div className="row" style={{ borderTop: '1px solid var(--c-line)', paddingTop: 12 }}>
+        <span className="small muted grow">Prefer a reset link by email instead?</span>
+        <button
+          className="btn btn-sm"
+          onClick={() =>
+            requestPasswordReset(user.email)
+              .then(() => toast(`Reset link sent to ${user.email}`))
+              .catch((e) => toast(e instanceof Error ? e.message : 'Could not send the email', 'error'))
+          }
+        >
+          Email me a reset link
+        </button>
+      </div>
+    </FormSection>
+  )
+}
+
 export function SettingsPage() {
   const { draft } = useAdmin()
   return (
     <>
-      <PageHeader title="Settings" eyebrow="Site">Connections and where each setting lives.</PageHeader>
+      <PageHeader title="Settings" eyebrow="Site">Your admin account, connections and where each setting lives.</PageHeader>
       <div className="stack" style={{ '--gap': 'var(--space-4)' } as CSSProperties}>
+        <AdminAccount />
         <FormSection title="Data connection">
           {store.mode === 'supabase' ? (
             <p><span className="badge badge-success">Connected</span> Content, learners, submissions and media are stored in Supabase.</p>

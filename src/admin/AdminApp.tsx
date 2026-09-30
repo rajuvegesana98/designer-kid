@@ -6,7 +6,7 @@ import {
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation } from 'react-router'
 import { BrandMark } from '../components/Brand'
-import { ConfirmDialog, FullPageLoader, Modal, Sheet, timeAgo } from '../components/ui'
+import { ConfirmDialog, FullPageLoader, Modal, PasswordInput, Sheet, timeAgo } from '../components/ui'
 import { store } from '../data'
 import { useAuth } from '../state/auth'
 import { useColorMode, useToast } from '../state/ui'
@@ -290,7 +290,7 @@ function AdminLogin() {
             </div>
             <div className="field">
               <label htmlFor="a-pass">Password</label>
-              <input id="a-pass" className="input" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <PasswordInput id="a-pass" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
             </div>
             {error && <p role="alert" style={{ color: 'var(--c-danger)' }}>{error}</p>}
             <button className="btn btn-primary btn-lg" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>

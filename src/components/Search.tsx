@@ -9,7 +9,7 @@ import { plain } from '../lib/markdown'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 
-export type ResultCategory = 'Lesson' | 'Module' | 'Challenge' | 'Resource' | 'Career guide'
+export type ResultCategory = 'Lesson' | 'Module' | 'Challenge' | 'Resource' | 'Career guide' | 'Article'
 
 export interface SearchResult {
   key: string
@@ -27,6 +27,7 @@ const CATEGORY_ICON: Record<ResultCategory, string> = {
   Challenge: 'Target',
   Resource: 'Bookmark',
   'Career guide': 'Briefcase',
+  Article: 'FileText',
 }
 
 export function buildIndex(content: SiteContent): SearchResult[] {
@@ -44,6 +45,7 @@ export function buildIndex(content: SiteContent): SearchResult[] {
     const section = CAREER_SECTIONS.find((s) => s.id === g.section)
     out.push({ key: `g-${g.id}`, category: 'Career guide', level: g.level, title: g.title, description: `${section?.title ?? ''} · ${g.summary}`, to: `/career/${g.section}#${g.id}` })
   }
+  for (const b of content.blog ?? []) out.push({ key: `b-${b.id}`, category: 'Article', level: 'all', title: b.title, description: b.excerpt, to: `/blog/${b.slug}` })
   return out
 }
 

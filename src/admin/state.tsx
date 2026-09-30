@@ -40,6 +40,8 @@ const SECTION_LABELS: Record<string, string> = {
   careerGuides: 'Career guides',
   announcements: 'Announcements',
   achievements: 'Achievements',
+  promos: 'Offers & banners',
+  blog: 'Blog',
 }
 
 export function diffSections(a: SiteContent, b: SiteContent): string[] {

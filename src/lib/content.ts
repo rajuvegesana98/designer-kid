@@ -32,6 +32,8 @@ export function studentView(content: SiteContent): SiteContent {
     resources: content.resources.filter((r) => r.published),
     careerGuides: content.careerGuides.filter((g) => g.published),
     announcements: content.announcements.filter((a) => a.published),
+    blog: (content.blog ?? []).filter((b) => b.published),
+    promos: (content.promos ?? []).filter((p) => p.enabled),
     navigation: content.navigation.filter((n) => n.visible),
   }
 }

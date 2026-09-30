@@ -220,7 +220,7 @@ export function AccountPage() {
   )
 }
 
-const CATS: ResultCategory[] = ['Lesson', 'Module', 'Challenge', 'Resource', 'Career guide']
+const CATS: ResultCategory[] = ['Lesson', 'Module', 'Challenge', 'Resource', 'Career guide', 'Article']
 
 export function SearchPage() {
   const { content } = useContent()

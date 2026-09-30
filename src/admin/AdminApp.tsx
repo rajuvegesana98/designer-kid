@@ -1,7 +1,7 @@
 import { motion } from 'motion/react'
 import {
-  ArrowLeft, BarChart3, BookOpen, Brush, CircleAlert, Eye, FolderOpen, History, Image, LayoutDashboard, Layers, Library, LogOut, Menu,
-  MessagesSquare, Moon, Rocket, Settings, Star, Sun, Target, Users, type LucideIcon,
+  ArrowLeft, BarChart3, BookOpen, Brush, CircleAlert, Eye, FolderOpen, History, Image, LayoutDashboard, Layers, Library, LogOut, Megaphone, Menu,
+  MessagesSquare, Newspaper, Moon, Rocket, Settings, Star, Sun, Target, Users, type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, NavLink, Navigate, Outlet, Route, Routes, useLocation } from 'react-router'
@@ -23,18 +23,22 @@ import { UsersPage } from './pages/Users'
 import { ConnectAdmin } from './pages/Connect'
 import { PublishingPage, SettingsPage } from './pages/Settings'
 import { ReviewsAdmin } from './pages/Reviews'
+import { OffersPage } from './pages/Offers'
+import { BlogAdmin } from './pages/Blog'
 
 const NAV: { to: string; label: string; icon: LucideIcon; group: string }[] = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard, group: 'Overview' },
   { to: '/admin/analytics', label: 'Analytics', icon: BarChart3, group: 'Overview' },
   { to: '/admin/courses', label: 'Courses', icon: BookOpen, group: 'Content' },
   { to: '/admin/challenges', label: 'Challenges', icon: Target, group: 'Content' },
+  { to: '/admin/blog', label: 'Blog', icon: Newspaper, group: 'Content' },
   { to: '/admin/content', label: 'Content library', icon: Library, group: 'Content' },
   { to: '/admin/levels', label: 'Levels', icon: Layers, group: 'Content' },
   { to: '/admin/media', label: 'Media', icon: Image, group: 'Content' },
   { to: '/admin/users', label: 'Users', icon: Users, group: 'People' },
   { to: '/admin/connect', label: '1:1 Connect', icon: MessagesSquare, group: 'People' },
   { to: '/admin/reviews', label: 'Reviews', icon: Star, group: 'People' },
+  { to: '/admin/offers', label: 'Offers & banners', icon: Megaphone, group: 'Site' },
   { to: '/admin/website', label: 'Website', icon: FolderOpen, group: 'Site' },
   { to: '/admin/theme', label: 'Theme', icon: Brush, group: 'Site' },
   { to: '/admin/publishing', label: 'Publishing', icon: History, group: 'Site' },
@@ -60,6 +64,8 @@ export default function AdminApp() {
           <Route path="users" element={<UsersPage />} />
           <Route path="connect" element={<ConnectAdmin />} />
           <Route path="reviews" element={<ReviewsAdmin />} />
+          <Route path="offers" element={<OffersPage />} />
+          <Route path="blog" element={<BlogAdmin />} />
           <Route path="website" element={<WebsitePage />} />
           <Route path="theme" element={<ThemePage />} />
           <Route path="publishing" element={<PublishingPage />} />

@@ -7,6 +7,7 @@ import { intermediatePractice } from './intermediatePractice'
 import { achievements, careerGuides, challenges, resources } from './library'
 import { interviewGuides } from './careerInterviews'
 import { profileGuides } from './careerProfiles'
+import { blogPosts } from './blog'
 
 const levels: Level[] = [
   {
@@ -118,6 +119,7 @@ export const seedContent: SiteContent = {
     { id: 'career', label: 'Career', path: '/career', visible: true },
     { id: 'resources', label: 'Resources', path: '/resources', visible: true },
     { id: 'progress', label: 'My Progress', path: '/progress', visible: true },
+    { id: 'blog', label: 'Blog', path: '/blog', visible: true },
     { id: 'reviews', label: 'Reviews', path: '/reviews', visible: true },
   ],
   footer: {
@@ -172,4 +174,25 @@ export const seedContent: SiteContent = {
     },
   ],
   achievements,
+  promos: [
+    {
+      id: 'promo-welcome',
+      enabled: false,
+      style: 'popup',
+      title: 'Free portfolio review week',
+      message: 'Book a 1:1 this week and get honest, practical feedback on one case study.',
+      ctaLabel: 'Book a session',
+      ctaUrl: '/career/portfolio',
+      image: '',
+      illustration: 'portfolio',
+      tone: 'primary',
+      startsAt: '',
+      endsAt: '',
+      audience: 'everyone',
+      pages: 'all',
+      dismissible: true,
+      version: 1,
+    },
+  ],
+  blog: blogPosts,
 }

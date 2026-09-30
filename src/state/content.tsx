@@ -24,7 +24,7 @@ export async function loadSeed(): Promise<SiteContent> {
 /** Older saved content may predate newer settings; fill any missing top-level sections from the defaults. */
 export async function withDefaults(content: SiteContent | null): Promise<SiteContent | null> {
   if (!content) return null
-  const keys: (keyof SiteContent)[] = ['brand', 'theme', 'home', 'navigation', 'footer', 'mentor', 'reviews', 'notifications', 'levels', 'challenges', 'resources', 'careerGuides', 'announcements', 'achievements']
+  const keys: (keyof SiteContent)[] = ['brand', 'theme', 'home', 'navigation', 'footer', 'mentor', 'reviews', 'notifications', 'levels', 'challenges', 'resources', 'careerGuides', 'announcements', 'achievements', 'promos', 'blog']
   const missing = keys.filter((k) => content[k] === undefined)
   if (!missing.length) return content
   const seed = await loadSeed()

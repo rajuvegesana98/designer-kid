@@ -1,5 +1,6 @@
 import { Check, Eye, RotateCcw, X } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
+import { BrandMark } from '../../components/Brand'
 import { ConfirmDialog, PageHeader, Tabs } from '../../components/ui'
 import type { Theme, ThemeColors } from '../../content/types'
 import { contrastRatio, ensureFonts, FONT_OPTIONS, onColor, themeVars } from '../../lib/theme'
@@ -15,6 +16,70 @@ const COLOR_KEYS: { key: keyof ThemeColors; label: string; hint: string }[] = [
   { key: 'surface', label: 'Surface', hint: 'Cards, panels and inputs.' },
   { key: 'text', label: 'Text', hint: 'Body copy and headings.' },
 ]
+
+const PRESETS: { name: string; light: ThemeColors; dark: ThemeColors; heading?: string; body?: string }[] = [
+  {
+    name: 'Designer Kid',
+    light: { primary: '#4F3FF0', secondary: '#E8590C', accent: '#0E9F6E', background: '#F5F4EF', surface: '#FFFFFF', text: '#16171D' },
+    dark: { primary: '#9D94FF', secondary: '#FF9E6B', accent: '#3DD6A3', background: '#0D0E13', surface: '#171820', text: '#F1F1F4' },
+    heading: 'Bricolage Grotesque',
+    body: 'Instrument Sans',
+  },
+  {
+    name: 'Ocean',
+    light: { primary: '#0B63CE', secondary: '#0E9AA7', accent: '#0E9F6E', background: '#F3F6FA', surface: '#FFFFFF', text: '#0F172A' },
+    dark: { primary: '#6CB2FF', secondary: '#4FD1C5', accent: '#3DD6A3', background: '#0B1220', surface: '#121A2B', text: '#E8EEF7' },
+    heading: 'Sora',
+    body: 'Inter',
+  },
+  {
+    name: 'Forest',
+    light: { primary: '#15803D', secondary: '#CA8A04', accent: '#0E7490', background: '#F4F6F1', surface: '#FFFFFF', text: '#14201A' },
+    dark: { primary: '#4ADE80', secondary: '#FACC15', accent: '#22D3EE', background: '#0C130F', surface: '#142019', text: '#E7F2EA' },
+    heading: 'Fraunces',
+    body: 'Work Sans',
+  },
+  {
+    name: 'Sunset',
+    light: { primary: '#C2410C', secondary: '#DB2777', accent: '#7C3AED', background: '#FBF6F1', surface: '#FFFFFF', text: '#1F1512' },
+    dark: { primary: '#FB923C', secondary: '#F472B6', accent: '#A78BFA', background: '#140E0B', surface: '#1E1612', text: '#F6EDE6' },
+    heading: 'Outfit',
+    body: 'DM Sans',
+  },
+  {
+    name: 'Mono',
+    light: { primary: '#18181B', secondary: '#71717A', accent: '#16A34A', background: '#F7F7F5', surface: '#FFFFFF', text: '#18181B' },
+    dark: { primary: '#FAFAFA', secondary: '#A1A1AA', accent: '#4ADE80', background: '#0A0A0B', surface: '#161618', text: '#F4F4F5' },
+    heading: 'Space Grotesk',
+    body: 'IBM Plex Sans',
+  },
+  {
+    name: 'Grape',
+    light: { primary: '#7E22CE', secondary: '#DB2777', accent: '#0D9488', background: '#F8F5FB', surface: '#FFFFFF', text: '#1A1523' },
+    dark: { primary: '#C084FC', secondary: '#F472B6', accent: '#2DD4BF', background: '#110D16', surface: '#1A1422', text: '#F1ECF7' },
+    heading: 'Plus Jakarta Sans',
+    body: 'Figtree',
+  },
+]
+
+function BrandPreview({ name, tagline, logo, favicon }: { name: string; tagline: string; logo: string; favicon: string }) {
+  return (
+    <div className="card card-flat stack" style={{ '--gap': '12px' } as CSSProperties}>
+      <span className="eyebrow">Brand preview</span>
+      <div className="row" style={{ flexWrap: 'nowrap' }}>
+        {logo ? <img src={logo} alt="" style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 10 }} /> : <BrandMark size={40} />}
+        <span>
+          <strong style={{ display: 'block', fontFamily: 'var(--font-heading)', fontSize: '1.15rem' }}>{name || 'Brand name'}</strong>
+          <span className="subtle">{tagline}</span>
+        </span>
+      </div>
+      <div className="favicon-tab" aria-label="Browser tab preview">
+        {favicon ? <img src={favicon} alt="" width={16} height={16} /> : <img src={`${import.meta.env.BASE_URL}favicon.svg`} alt="" width={16} height={16} />}
+        <span>{name} — {tagline}</span>
+      </div>
+    </div>
+  )
+}
 
 function ContrastRow({ label, a, b, min }: { label: string; a: string; b: string; min: number }) {
   const r = contrastRatio(a, b)
@@ -99,6 +164,32 @@ export function ThemePage() {
             </div>
           </FormSection>
 
+          <FormSection title="Quick themes" description="Apply a complete palette and font pairing in one click — then fine-tune below. Nothing changes for students until you publish.">
+            <div className="preset-grid">
+              {PRESETS.map((p) => (
+                <button
+                  key={p.name}
+                  type="button"
+                  className="preset"
+                  onClick={() =>
+                    set((th) => {
+                      th.light = { ...p.light }
+                      th.dark = { ...p.dark }
+                      if (p.heading) th.fonts.heading = p.heading
+                      if (p.body) th.fonts.body = p.body
+                    })
+                  }
+                >
+                  <span className="preset-swatches" aria-hidden>
+                    {[p.light.primary, p.light.secondary, p.light.accent, p.dark.background].map((c) => <span key={c} style={{ background: c }} />)}
+                  </span>
+                  <strong>{p.name}</strong>
+                  <span className="subtle" style={{ fontSize: '0.75rem' }}>{p.heading} · {p.body}</span>
+                </button>
+              ))}
+            </div>
+          </FormSection>
+
           <FormSection title="Colours" actions={<Tabs id="cmode" label="Colour mode" value={editMode} onChange={setEditMode} tabs={[{ value: 'light', label: 'Light' }, { value: 'dark', label: 'Dark' }]} />}>
             <div className="grid grid-2">
               {COLOR_KEYS.map((c) => (
@@ -139,6 +230,7 @@ export function ThemePage() {
           </FormSection>
         </div>
         <aside className="stack theme-preview" aria-label="Theme preview" style={{ '--gap': 'var(--space-4)' } as CSSProperties}>
+          <BrandPreview name={draft.brand.name} tagline={draft.brand.tagline} logo={draft.brand.logoUrl} favicon={draft.brand.faviconUrl} />
           <ThemePreview theme={t} mode={editMode} />
         </aside>
       </div>

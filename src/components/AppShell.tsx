@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 import {
-  BookOpen, Briefcase, ChevronRight, ExternalLink, Home, Library, Link2, LogIn, Menu, MessagesSquare, Moon, Search, Settings2, Star, Sun, Target, TrendingUp, UserRound,
+  BookOpen, Briefcase, ChevronRight, ExternalLink, Home, Library, Link2, LogIn, Menu, MessagesSquare, Newspaper, Moon, Search, Settings2, Star, Sun, Target, TrendingUp, UserRound,
   type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
@@ -28,6 +28,7 @@ const NAV_ICONS: Record<string, LucideIcon> = {
   resources: Library,
   progress: TrendingUp,
   reviews: Star,
+  blog: Newspaper,
 }
 
 function isExternal(path: string) {

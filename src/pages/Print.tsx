@@ -189,3 +189,29 @@ export function PrintGuide() {
     </PrintShell>
   )
 }
+
+export function PrintBlog() {
+  const { postId } = useParams()
+  const { content } = useContent()
+  const post = (content.blog ?? []).find((p) => p.id === postId)
+  if (!post) return <div className="page"><EmptyState icon="BookOpen" title="Article not found" /></div>
+  return (
+    <PrintShell title={post.title} back={`/blog/${post.slug}`}>
+      <article className="print-lesson">
+        <header className="print-cover">
+          {post.coverImage ? (
+            <img src={post.coverImage} alt="" style={{ borderRadius: 16, maxWidth: 520 }} />
+          ) : post.cover ? (
+            <div className="lesson-cover" style={{ maxWidth: 520 }}><Illustration name={post.cover} title="" /></div>
+          ) : null}
+          <span className="eyebrow">Blog · {post.tags.join(' · ')}</span>
+          <h1 style={{ fontSize: '2.2rem' }}>{post.title}</h1>
+          <p className="lead">{post.excerpt}</p>
+          <p className="subtle">By {post.author} · {post.date} · {post.minutes} min read</p>
+        </header>
+        <Blocks blocks={post.blocks} />
+      </article>
+      <DocFooter />
+    </PrintShell>
+  )
+}

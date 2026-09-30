@@ -1083,3 +1083,30 @@ h1.inline-editable, h3.inline-editable { margin: 0 0 8px; }
 .admin-split.focus > aside { display: none; }
 .lesson-main .lesson-cover { max-width: 460px; }
 @media (max-width: 640px) { .lesson-main .lesson-cover { max-width: none; } }
+
+/* ─── Offers ───────────────────────────────────────────────────────────── */
+
+.promo-bar { position: relative; padding: 10px 52px 10px 20px; font-size: 0.95rem; }
+.promo-bar-inner { display: flex; align-items: center; justify-content: center; gap: 8px 14px; flex-wrap: wrap; text-align: center; max-width: 1100px; margin: 0 auto; }
+.promo-bar-msg { opacity: 0.92; }
+.promo-bar-cta { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: inherit; text-decoration: underline; text-underline-offset: 3px; min-height: 32px; }
+.promo-close { position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 10px; cursor: pointer; }
+.promo-close:hover { background: rgb(255 255 255 / 0.18); }
+@media (pointer: coarse) { .promo-close { width: 44px; height: 44px; } }
+
+/* ─── Blog ─────────────────────────────────────────────────────────────── */
+
+.blog-card { padding: 0; overflow: hidden; height: 100%; display: flex; flex-direction: column; }
+.blog-card-cover { background: var(--c-surface-2); }
+.blog-card-cover svg, .blog-card-cover img { display: block; width: 100%; }
+.blog-cover-img { width: 100%; object-fit: cover; aspect-ratio: 16 / 9; border-radius: 0; }
+.blog-card-featured { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); align-items: center; }
+@media (max-width: 760px) { .blog-card-featured { grid-template-columns: minmax(0, 1fr); } }
+.blog-hero { border-radius: var(--r-card); overflow: hidden; border: 1px solid var(--c-line); }
+.blog-hero svg, .blog-hero img { display: block; width: 100%; }
+.preset-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.preset { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px; border-radius: var(--r-base); border: 1px solid var(--c-line-strong); background: var(--c-surface); cursor: pointer; text-align: left; }
+.preset:hover { border-color: var(--c-primary); box-shadow: var(--shadow-1); }
+.preset-swatches { display: flex; gap: 4px; }
+.preset-swatches span { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--c-line); }
+.favicon-tab { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: 10px 10px 0 0; background: var(--c-surface-3); font-size: 0.8rem; max-width: 100%; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; width: fit-content; }

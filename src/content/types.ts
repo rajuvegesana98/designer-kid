@@ -263,6 +263,47 @@ export interface FooterLink {
   url: string
 }
 
+/** A marketing offer shown when people land on the site. */
+export interface Promo {
+  id: string
+  enabled: boolean
+  /** 'bar' = slim strip above the page, 'popup' = centred dialog. */
+  style: 'bar' | 'popup'
+  title: string
+  message: string
+  ctaLabel: string
+  /** Internal path (/learn) or full https:// link. */
+  ctaUrl: string
+  image: string
+  illustration?: IllustrationName
+  tone: 'primary' | 'secondary' | 'accent' | 'dark'
+  /** ISO dates (YYYY-MM-DD); empty = no limit. */
+  startsAt: string
+  endsAt: string
+  audience: 'everyone' | 'new' | 'returning'
+  pages: 'all' | 'home'
+  dismissible: boolean
+  /** Bumped when the offer is edited so visitors who dismissed it see the new version. */
+  version: number
+}
+
+export interface BlogPost {
+  id: string
+  slug: string
+  title: string
+  excerpt: string
+  cover?: IllustrationName
+  coverImage: string
+  author: string
+  date: string
+  tags: string[]
+  minutes: number
+  blocks: Block[]
+  attachments?: FileAsset[]
+  featured: boolean
+  published: boolean
+}
+
 export interface SiteContent {
   schemaVersion: 1
   brand: { name: string; tagline: string; logoUrl: string; faviconUrl: string }
@@ -320,4 +361,6 @@ export interface SiteContent {
   careerGuides: CareerGuide[]
   announcements: Announcement[]
   achievements: Achievement[]
+  promos: Promo[]
+  blog: BlogPost[]
 }

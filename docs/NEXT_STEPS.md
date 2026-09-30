@@ -17,7 +17,7 @@
 - Uploaded PowerPoint files are attached/embedded, not converted into editable slides.
 - "Download PDF" uses the browser's print dialog (choose "Save as PDF").
 - Supabase free projects pause after ~1 week without traffic (first visit wakes it; or upgrade to Pro).
-- The main JS bundle is ~190 KB gzipped (seed content is a separate lazy chunk); could be split further.
+- The main JS bundle is ~246 KB gzipped and the seed chunk ~243 KB (see PERFORMANCE.md); the seed currently loads on every visit until the owner republishes once.
 - Dormant code: learner sign-up and the Submissions/Users account features remain in the codebase (useful if
   accounts are ever re-enabled) but aren't linked in the learner UI.
 

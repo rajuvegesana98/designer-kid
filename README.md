@@ -1,46 +1,101 @@
 # Designer Kid
 
-**Learn. Design. Build. Grow.** A UI/UX learning & career platform with three levels (Beginner, Intermediate,
-Expert), 182 lessons, challenges, a Career Centre, a blog, reviews, 1:1 booking, and an admin studio where
-every piece of content is edited like slides and published with Draft → Preview → Publish.
+**Learn. Design. Build. Grow.** — a UI/UX learning & career platform for Beginner, Intermediate and Expert
+designers, with a full admin studio for the owner.
 
 - **Live:** https://rajuvegesana98.github.io/designer-kid/ · **Admin:** `/admin`
-- **Learners need no account** — progress saves in their browser (with backup/restore).
-- **Stack:** Vite · React 19 · TypeScript · Motion · React Router · Supabase (free tier) · GitHub Pages
+- **Status:** live in production (docs v2.0, 30 Sep 2026). See [docs/MASTER_SPECIFICATION.md](docs/MASTER_SPECIFICATION.md) for what works, what's pending and what to fix first.
 
-> AI agents and developers: read **[AGENTS.md](AGENTS.md)** first, then **[docs/](docs/README.md)**.
+> **New developer or AI agent? START HERE:** [docs/MASTER_SPECIFICATION.md](docs/MASTER_SPECIFICATION.md) → [AGENTS.md](AGENTS.md) → [docs/README.md](docs/README.md).
 
-## Quick start
+## Overview
+Learners pick a level and study for free — **no account needed** (progress, notes and bookmarks save in the
+browser, with download/restore). The owner edits every piece of content in `/admin` with a PowerPoint-style
+slide editor and publishes with **Draft → Preview → Publish**. Content, admin sign-in, reviews, media and
+anonymous analytics live in **Supabase**; the site is a static React app on **GitHub Pages**.
+
+## Features
+- 182 lessons across 3 levels (Learn → Example → Practice → Challenge), 7 interactive widgets, 28 illustrations
+- 21 design challenges · Career Centre with 27 guides (interview Q&A, resume, LinkedIn, portfolio…) and tools
+- Blog (12 articles) · 28 resources · reviews · 1:1 booking panel · offers (banner / pop-up)
+- Progress, streaks, achievements, bookmarks, notes, search (⌘K), notifications, PDF downloads, dark mode
+- Admin: slide editor, courses, blog, challenges, library, levels, media (images/PDF/PPT), reviews, offers,
+  website, theme (presets, logo, favicon), analytics, users, publishing history, backup, password settings
+
+Full inventory with statuses: [docs/FEATURES.md](docs/FEATURES.md).
+
+## Technology stack
+React 19 · TypeScript 6 · Vite 8 · React Router 8 · Motion 13 · lucide-react · plain CSS design system ·
+@supabase/supabase-js 2 (Postgres + RLS, Auth, Storage, RPC) · GitHub Actions + Pages · dev: motion-studio,
+oxlint. Details and versions: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md).
+
+## Requirements
+- **Node.js ≥ 22.22** (react-router 8.4 engines) and npm; git
+- Optional for production: a Supabase project and a GitHub repository with Pages
+
+## Installation
 ```bash
-npm install
-cp .env.example .env.local        # fill in the Supabase URL + publishable key (or leave empty for browser-only mode)
-npm run dev                       # http://localhost:5173 (with Motion Studio)
-npm run build                     # production build + checks
+git clone https://github.com/rajuvegesana98/designer-kid.git
+cd designer-kid
+npm ci
 ```
-Node 22.13+ required.
+Clean-machine guide: [docs/INSTALLATION.md](docs/INSTALLATION.md).
 
-## Documentation
-| | |
-|---|---|
-| [AGENTS.md](AGENTS.md) | Architecture, rules, how to change things safely, gotchas |
-| [docs/FEATURES.md](docs/FEATURES.md) | Everything learners and admins can do |
-| [docs/ADMIN_GUIDE.md](docs/ADMIN_GUIDE.md) | How the owner edits, previews and publishes |
-| [docs/OPERATIONS.md](docs/OPERATIONS.md) | Hosting, Supabase, keys, migrations, costs, deploying |
-| [docs/ORIGINAL_BRIEF.md](docs/ORIGINAL_BRIEF.md) | Full original brief + follow-up requests + decisions |
-| [docs/SESSION_HISTORY.md](docs/SESSION_HISTORY.md) | What happened during the build, in order |
-| [docs/TESTING.md](docs/TESTING.md) | Typecheck, build and browser test suites |
-| [docs/NEXT_STEPS.md](docs/NEXT_STEPS.md) | Pending actions, limitations, ideas |
+## Environment setup
+```bash
+cp .env.example .env.local
+# VITE_SUPABASE_URL / VITE_SUPABASE_ANON_KEY (publishable key) — leave empty for browser-only mode
+```
+All variables: [docs/ENVIRONMENT.md](docs/ENVIRONMENT.md). Never use the Supabase secret/service_role key.
 
-## Project layout
+## Development
+```bash
+npm run dev                          # http://localhost:5173 (with Motion Studio panel)
+MOTION_STUDIO=off npm run dev        # without Motion Studio
+VITE_SUPABASE_URL= npm run dev       # force browser-only mode
+npx tsc --noEmit -p tsconfig.app.json
 ```
-src/content/      content types + starter content (182 lessons, guides, blog, challenges…)
-src/data/         DataStore interface → Supabase or browser-only implementation
-src/state/        content (+live preview), admin auth, learner progress, theme & toasts
-src/lib/          progress rules, content queries, theme engine, covers, markdown, icons
-src/components/   app shell, lesson blocks, widgets, illustrations, search, offers, UI kit
-src/pages/        learner pages (landing, dashboard, learn, lesson, career, blog, reviews, print…)
-src/admin/        admin studio (lazy chunk): slide editor, pages, draft/publish state
-supabase/         schema.sql + migrations/
-tools/e2e/        Playwright browser test suites
-.github/workflows deploy to GitHub Pages
+
+## Database setup
+Supabase SQL editor → run `supabase/schema.sql` (idempotent; already includes migrations 002 and 003).
+Make an admin: `insert into public.admins (user_id) select id from auth.users where email = '<your email>';`
+Then open `/admin` and **Publish** once. Details: [docs/DATABASE.md](docs/DATABASE.md).
+
+## Build
+```bash
+npm run build      # tsc -b && vite build && node scripts/postbuild.mjs (no Motion Studio in dist, 404.html)
+npm run preview    # serve dist locally
 ```
+
+## Deployment
+Push to `main` → `.github/workflows/deploy.yml` builds (with `BASE_PATH` and the `VITE_SUPABASE_*` repository
+variables) and deploys to GitHub Pages. Content changes need no deploy — publish them in `/admin`.
+See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
+
+## Troubleshooting
+Blank page (BASE_PATH), deep links returning 404 (expected on Pages), "Invalid API key", tables not found,
+reviews rejected (migration 003), paused Supabase project, wrong GitHub account on push, and more:
+[docs/TROUBLESHOOTING.md](docs/TROUBLESHOOTING.md).
+
+## Project structure
+```text
+src/content/     content types + seed content        src/admin/       admin studio (lazy chunk)
+src/data/        DataStore → Supabase / localStorage  src/pages/       learner pages
+src/state/       content, auth, learner, theme        src/components/  UI kit, blocks, widgets, shell
+src/lib/         progress, content, theme, covers     supabase/        schema + migrations
+tools/e2e/       browser tests                        docs/            documentation
+```
+Full annotated tree: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md).
+
+## Important configuration
+`vite.config.ts` (base path, Motion Studio dev plugin) · `scripts/postbuild.mjs` · `.github/workflows/deploy.yml`
+· `supabase/schema.sql` · `src/content/types.ts` (content contract) · `src/data/index.ts` (backend switch).
+
+## Known limitations
+Learner progress is per browser · migrations 002/003 pending on production · no booking link configured yet ·
+minimal SEO tags · analytics are anonymous counts · PPT files are attached, not converted to slides.
+See [docs/MASTER_SPECIFICATION.md](docs/MASTER_SPECIFICATION.md#current-state) and [docs/TECHNICAL_DEBT.md](docs/TECHNICAL_DEBT.md).
+
+## Future development
+Recommendations in [docs/FUTURE_ROADMAP.md](docs/FUTURE_ROADMAP.md). History: [CHANGELOG.md](CHANGELOG.md),
+[docs/DEVELOPMENT_HISTORY.md](docs/DEVELOPMENT_HISTORY.md).

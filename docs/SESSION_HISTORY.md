@@ -68,7 +68,7 @@ fixed. Useful for anyone (human or AI) picking the project up later.
   enabled with build type "workflow", repository variables `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` set.
 - Supabase: first project `ywbiyutmrwmjnbllyzxd` was set up, then the owner created **`zcxnlelzhkwbvittgcuj`**
   (current). Schema run by the owner in the SQL editor; verified via REST (tables, RLS, publish blocked for
-  anonymous users). Owner made `rajuvegesana98@gmail.com` admin and published → 182 lessons + 27 guides in DB.
+  anonymous users). Owner made their own account admin and published → 182 lessons + 27 guides in DB.
 
 ## Phase 6 — Owner requests round 3
 - **Offers & banners** (bar or pop-up, schedule, audience, pages, dismissal memory, live preview).

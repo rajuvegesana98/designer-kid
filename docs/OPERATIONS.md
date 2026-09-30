@@ -9,8 +9,8 @@
 | Deploy | GitHub Actions → Pages (`.github/workflows/deploy.yml`) on every push to `main` |
 | Supabase project | `zcxnlelzhkwbvittgcuj` → https://zcxnlelzhkwbvittgcuj.supabase.co |
 | Supabase dashboard | https://supabase.com/dashboard/project/zcxnlelzhkwbvittgcuj |
-| Publishable key | `sb_publishable_Jotbmi8ryNj0zexxI7MIuA_e07zoDOt` (browser-safe; already public in the built JS) |
-| Admin account | rajuvegesana98@gmail.com (row in `public.admins`) |
+| Publishable key | `<publishable key — see .env.local or Supabase → Project Settings → API Keys>` (browser-safe; already public in the built JS) |
+| Admin account | the owner's email (see Supabase → Authentication → Users; row in `public.admins`) |
 | GitHub account | rajuvegesana98 |
 | Older, unused Supabase project | `ywbiyutmrwmjnbllyzxd` (fully set up earlier; can be deleted) |
 
@@ -20,7 +20,7 @@ Never put a Supabase **secret / service_role** key in this app or in GitHub vari
 `.env.local` (not committed — copy from `.env.example`):
 ```
 VITE_SUPABASE_URL=https://zcxnlelzhkwbvittgcuj.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_Jotbmi8ryNj0zexxI7MIuA_e07zoDOt
+VITE_SUPABASE_ANON_KEY=<publishable key — see .env.local or Supabase → Project Settings → API Keys>
 MOTION_STUDIO_AGENT_PROVIDER=claude
 ```
 GitHub → Settings → Secrets and variables → Actions → **Variables**: `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`.
@@ -29,7 +29,7 @@ The workflow sets `BASE_PATH=/designer-kid/` automatically.
 ## Supabase setup (fresh project)
 1. SQL Editor → run `supabase/schema.sql` (idempotent; includes migrations 002 and 003 at the end).
 2. Authentication → URL Configuration: Site URL `https://rajuvegesana98.github.io/designer-kid/`;
-   Redirect URLs `https://rajuvegesana98.github.io/designer-kid/**` and `http://localhost:5180/**`.
+   Redirect URLs `https://rajuvegesana98.github.io/designer-kid/**` and `http://localhost:5173/**` (Vite default dev port; add any other port you use).
 3. Create the admin login (Authentication → Users → Add user, or sign in on `/account` if sign-up is
    enabled), then: `insert into public.admins (user_id) select id from auth.users where email = '…';`
 4. Open `/admin` → Publish once (stores the starter content in the database).
@@ -45,7 +45,7 @@ The workflow sets `BASE_PATH=/designer-kid/` automatically.
 
 Check from a terminal (anonymous key):
 ```bash
-K=sb_publishable_…; U=https://zcxnlelzhkwbvittgcuj.supabase.co
+K=<publishable key>; U=https://zcxnlelzhkwbvittgcuj.supabase.co
 curl -s "$U/rest/v1/profiles?select=blocked&limit=1" -H "apikey: $K" -H "Authorization: Bearer $K"   # 200 once 002 ran
 ```
 

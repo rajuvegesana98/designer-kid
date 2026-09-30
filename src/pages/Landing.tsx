@@ -12,6 +12,7 @@ import { Icon } from '../lib/icons'
 import { useContent } from '../state/content'
 import { SiteFooter } from '../components/AppShell'
 import { ReviewsSection } from './Reviews'
+import { UXMarquee, DesignRulers } from '../components/LandingChrome'
 
 export function Landing() {
   const { content, isPreview } = useContent()
@@ -19,7 +20,9 @@ export function Landing() {
   const h = content.home
 
   return (
-    <div className="canvas-bg" style={{ minHeight: '100dvh' }}>
+    <div className="canvas-bg landing-frame" style={{ minHeight: '100dvh' }}>
+      <DesignRulers />
+      <UXMarquee />
       <a href="#main" className="skip-link">Skip to content</a>
       {isPreview && <div className="banner banner-preview" role="status"><strong>Preview</strong> Unpublished draft — this is how the homepage will look.</div>}
       <header className="page row-between" style={{ paddingTop: 20, paddingBottom: 0 }}>

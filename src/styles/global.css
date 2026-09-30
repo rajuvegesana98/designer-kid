@@ -928,6 +928,133 @@ kbd {
 
 .illus { width: 100%; height: auto; }
 
+/* ── Design Ruler (top + bottom, mouse-responsive) ─────────────────────── */
+.design-ruler {
+  position: fixed;
+  left: 0; right: 0;
+  height: 22px;
+  background: color-mix(in oklab, var(--c-surface) 92%, var(--c-primary));
+  border-bottom: 1px solid var(--c-line-strong);
+  z-index: 200;
+  overflow: hidden;
+  pointer-events: none;
+  display: flex;
+  align-items: flex-end;
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 9px;
+  color: var(--c-text-3);
+  user-select: none;
+}
+.design-ruler--bottom {
+  top: auto;
+  bottom: 0;
+  align-items: flex-start;
+  border-bottom: none;
+  border-top: 1px solid var(--c-line-strong);
+}
+.design-ruler__track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+}
+.design-ruler--bottom .design-ruler__track { align-items: flex-start; }
+.design-ruler__tick {
+  position: absolute;
+  bottom: 0;
+  width: 1px;
+  background: var(--c-line-strong);
+}
+.design-ruler--bottom .design-ruler__tick { bottom: auto; top: 0; }
+.design-ruler__label {
+  position: absolute;
+  bottom: 3px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  line-height: 1;
+}
+.design-ruler--bottom .design-ruler__label { bottom: auto; top: 3px; }
+.design-ruler__cursor {
+  position: absolute;
+  top: 0; bottom: 0;
+  width: 1px;
+  background: var(--c-primary);
+  opacity: 0.8;
+}
+.design-ruler__cursor-label {
+  position: absolute;
+  top: 3px;
+  transform: translateX(-50%);
+  background: var(--c-primary);
+  color: var(--c-on-primary);
+  font-size: 8px;
+  padding: 1px 4px;
+  border-radius: 3px;
+  white-space: nowrap;
+  line-height: 1.4;
+  pointer-events: none;
+}
+.design-ruler--bottom .design-ruler__cursor-label { top: auto; bottom: 3px; }
+
+/* ── UX Marquee (left side scrolling bar) ──────────────────────────────── */
+.ux-marquee {
+  position: fixed;
+  left: 0;
+  top: 22px;
+  bottom: 22px;
+  width: 22px;
+  z-index: 199;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--c-surface) 92%, var(--c-primary));
+  border-right: 1px solid var(--c-line-strong);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ux-marquee__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: ux-scroll 28s linear infinite;
+  gap: 0;
+}
+.ux-marquee__inner:hover { animation-play-state: paused; }
+@keyframes ux-scroll {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.ux-marquee__item {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  transform: rotate(180deg);
+  font-family: 'SFMono-Regular', 'Consolas', monospace;
+  font-size: 8.5px;
+  letter-spacing: 0.06em;
+  color: var(--c-text-3);
+  padding: 10px 0;
+  white-space: nowrap;
+  user-select: none;
+  line-height: 1;
+}
+.ux-marquee__item--accent { color: var(--c-primary-text); font-weight: 600; }
+.ux-marquee__item--dot {
+  width: 4px; height: 4px;
+  border-radius: 50%;
+  background: var(--c-line-strong);
+  padding: 0;
+  writing-mode: horizontal-tb;
+  transform: none;
+  margin: 4px 0;
+}
+
+/* offset landing page content so rulers/marquee don't overlap */
+.landing-frame {
+  padding-top: 22px;
+  padding-bottom: 22px;
+  padding-left: 22px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

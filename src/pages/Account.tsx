@@ -1,10 +1,10 @@
-import { ArrowLeft, LogOut, Monitor, Moon, Sun } from 'lucide-react'
+import { ArrowLeft, Download, LogOut, Monitor, Moon, Sun, Upload } from 'lucide-react'
 import { useEffect, useId, useState, type CSSProperties, type FormEvent } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router'
 import { Brand } from '../components/Brand'
 import { LevelSwitcher } from '../components/LevelSwitcher'
 import { buildIndex, LevelFilter, ResultRow, searchIndex, type ResultCategory } from '../components/Search'
-import { ConfirmDialog, EmptyState, LevelBadge, PageHeader, Tabs } from '../components/ui'
+import { ConfirmDialog, EmptyState, LevelBadge, PageHeader } from '../components/ui'
 import type { LevelId } from '../content/types'
 import { getLevel } from '../lib/content'
 import { useAuth } from '../state/auth'
@@ -14,7 +14,7 @@ import { useColorMode, useToast, type ModePref } from '../state/ui'
 
 export function ProfilePage() {
   const { content } = useContent()
-  const { state, setName, resetProgress } = useLearner()
+  const { state, setName, resetProgress, importState } = useLearner()
   const { user, mode, signOut, updatePassword } = useAuth()
   const { pref, setPref } = useColorMode()
   const toast = useToast()
@@ -59,26 +59,53 @@ export function ProfilePage() {
         </section>
 
         <section className="card stack" aria-labelledby="p-account">
-          <h2 id="p-account" style={{ fontSize: '1.15rem' }}>Account</h2>
-          {mode === 'local' ? (
-            <p className="muted">Your progress, notes and bookmarks are saved in this browser. Accounts become available once the site owner connects a database.</p>
-          ) : user ? (
-            <div className="row-between">
-              <span>
-                Signed in as <strong>{user.email}</strong>
-                <span className="subtle" style={{ display: 'block' }}>Progress syncs across your devices.</span>
+          <h2 id="p-account" style={{ fontSize: '1.15rem' }}>Your progress</h2>
+          <p className="muted">No account needed — your progress, notes, bookmarks and checklists are saved in this browser. Clearing your browser data removes them, so download a backup now and then. You can restore it on any device.</p>
+          <div className="row">
+            <button
+              className="btn"
+              onClick={() => {
+                const a = document.createElement('a')
+                a.href = URL.createObjectURL(new Blob([JSON.stringify({ app: 'designer-kid', version: 1, state }, null, 2)], { type: 'application/json' }))
+                a.download = `designer-kid-progress-${new Date().toISOString().slice(0, 10)}.json`
+                a.click()
+                URL.revokeObjectURL(a.href)
+                toast('Backup downloaded')
+              }}
+            >
+              <Download size={16} aria-hidden /> Download my progress
+            </button>
+            <label className="btn">
+              <Upload size={16} aria-hidden /> Restore from backup
+              <input
+                type="file"
+                accept="application/json,.json"
+                className="sr-only"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0]
+                  e.target.value = ''
+                  if (!file) return
+                  try {
+                    const data = JSON.parse(await file.text())
+                    if (data?.app !== 'designer-kid' || !data.state?.completedLessons) throw new Error()
+                    importState(data.state)
+                    toast('Progress restored and merged')
+                  } catch {
+                    toast('That file isn’t a Designer Kid progress backup.', 'error')
+                  }
+                }}
+              />
+            </label>
+          </div>
+          {user && (
+            <div className="row-between" style={{ borderTop: '1px solid var(--c-line)', paddingTop: 12 }}>
+              <span className="small">Signed in as <strong>{user.email}</strong>{user.isAdmin ? ' (admin)' : ''}</span>
+              <span className="row">
+                {user.isAdmin && <Link to="/admin" className="btn btn-soft btn-sm">Admin dashboard</Link>}
+                <button className="btn btn-sm" onClick={() => signOut().then(() => toast('Signed out'))}><LogOut size={15} aria-hidden /> Sign out</button>
               </span>
-              <button className="btn" onClick={() => signOut().then(() => toast('Signed out'))}>
-                <LogOut size={16} aria-hidden /> Sign out
-              </button>
-            </div>
-          ) : (
-            <div className="row-between">
-              <span className="muted">Create a free account to keep your progress on every device.</span>
-              <Link to="/account" className="btn btn-primary">Sign in or create account</Link>
             </div>
           )}
-          {user?.isAdmin && <Link to="/admin" className="btn btn-soft" style={{ width: 'fit-content' }}>Open admin dashboard</Link>}
         </section>
 
         {user && mode === 'supabase' && (
@@ -135,8 +162,9 @@ export function AccountPage() {
   const { signIn, signUp, mode, user, requestPasswordReset, suspended } = useAuth()
   const { state } = useLearner()
   const [params] = useSearchParams()
-  const [tab, setTab] = useState<'signin' | 'signup'>(params.get('mode') === 'signup' ? 'signup' : 'signin')
-  const [forgot, setForgot] = useState(false)
+  // Learners don't need accounts; this page is the admin sign-in and password reset.
+  const tab = 'signin' as 'signin' | 'signup'
+  const [forgot, setForgot] = useState(params.has('forgot'))
   const [name, setName] = useState(state.name)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -145,7 +173,7 @@ export function AccountPage() {
   const [busy, setBusy] = useState(false)
   const navigate = useNavigate()
   const ids = { name: useId(), email: useId(), password: useId() }
-  const next = params.get('next') || '/'
+  const next = params.get('next') || '/admin'
 
   useEffect(() => {
     if (user) navigate(next, { replace: true })
@@ -195,8 +223,8 @@ export function AccountPage() {
       </header>
       <main id="main" className="page" style={{ maxWidth: 480 }}>
         <div className="card stack" style={{ padding: 'var(--space-6)' }}>
-          <h1 style={{ fontSize: '1.8rem' }}>{forgot ? 'Reset your password' : tab === 'signin' ? 'Welcome back' : 'Create your free account'}</h1>
-          {!forgot && tab === 'signup' && mode === 'supabase' && <p className="muted small">Save your progress, notes and bookmarks and pick up on any device.</p>}
+          <h1 style={{ fontSize: '1.8rem' }}>{forgot ? 'Reset your password' : 'Admin sign in'}</h1>
+          {!forgot && <p className="muted small">For Designer Kid admins. Learners don’t need an account — progress saves in the browser. <Link to="/">Go to the site</Link></p>}
           {mode === 'local' ? (
             <p className="muted">Accounts aren’t switched on yet. You can keep learning — your progress is saved in this browser.</p>
           ) : (
@@ -216,20 +244,6 @@ export function AccountPage() {
                 </form>
               ) : (
               <>
-              <Tabs<'signin' | 'signup'>
-                id="auth"
-                label="Account"
-                value={tab}
-                onChange={(v) => {
-                  setTab(v)
-                  setError('')
-                  setInfo('')
-                }}
-                tabs={[
-                  { value: 'signin', label: 'Sign in' },
-                  { value: 'signup', label: 'Create account' },
-                ]}
-              />
               <form id="auth-panel" role="tabpanel" className="stack" onSubmit={submit} noValidate>
                 {tab === 'signup' && (
                   <div className="field">

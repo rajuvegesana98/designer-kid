@@ -40,6 +40,8 @@ interface LearnerCtx {
   completeChallenge(challengeId: string, title: string, link: string, notes: string): Promise<void>
   markNotificationsSeen(): void
   resetProgress(): void
+  /** Replace progress with a backup file's contents. */
+  importState(next: LearnerState): void
 }
 
 const Ctx = createContext<LearnerCtx | null>(null)
@@ -174,6 +176,9 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       },
       resetProgress() {
         update((s) => ({ ...emptyLearner(), name: s.name, level: s.level }))
+      },
+      importState(next) {
+        update((s) => mergeLearner({ ...emptyLearner(), ...next }, s))
       },
     }),
     [state, synced, update],

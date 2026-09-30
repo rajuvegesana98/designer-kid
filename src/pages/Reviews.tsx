@@ -91,7 +91,7 @@ export function ReviewsSection() {
 
 function ReviewForm({ onDone }: { onDone: () => void }) {
   const { content } = useContent()
-  const { user, mode } = useAuth()
+  const { user } = useAuth()
   const { state } = useLearner()
   const toast = useToast()
   const [name, setName] = useState(state.name || user?.name || '')
@@ -103,15 +103,6 @@ function ReviewForm({ onDone }: { onDone: () => void }) {
   const [busy, setBusy] = useState(false)
   const [sent, setSent] = useState<null | 'pending' | 'approved'>(null)
   const ids = { name: useId(), role: useId(), text: useId(), consent: useId() }
-
-  if (mode === 'supabase' && !user)
-    return (
-      <div className="card stack">
-        <h2 style={{ fontSize: '1.2rem' }}>Write a review</h2>
-        <p className="muted">Please sign in so we can keep reviews genuine. It takes a minute.</p>
-        <Link to="/account?next=/reviews" className="btn btn-primary" style={{ width: 'fit-content' }}>Sign in to write a review</Link>
-      </div>
-    )
 
   if (sent)
     return (

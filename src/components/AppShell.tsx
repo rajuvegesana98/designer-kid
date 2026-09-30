@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 import {
-  BookOpen, Briefcase, ChevronRight, ExternalLink, Home, Library, Link2, LogIn, Menu, MessagesSquare, Newspaper, Moon, Search, Settings2, Star, Sun, Target, TrendingUp, UserRound,
+  BookOpen, Briefcase, ChevronRight, ExternalLink, Home, Library, Link2, Menu, MessagesSquare, Newspaper, Moon, Search, Settings2, Star, Sun, Target, TrendingUp, UserRound,
   type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
@@ -196,13 +196,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   <Settings2 size={20} />
                 </Link>
               )}
-              {!user && store.mode === 'supabase' ? (
-                <Link to="/account" className="btn btn-soft btn-sm">
-                  <LogIn size={16} aria-hidden /> <span>Sign in</span>
-                </Link>
-              ) : (
-                <Avatar />
-              )}
+              <Avatar />
             </div>
           </header>
 

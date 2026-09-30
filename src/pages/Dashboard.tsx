@@ -4,8 +4,6 @@ import { useMemo, useState, type CSSProperties } from 'react'
 import { Link } from 'react-router'
 import { LevelSwitcher } from '../components/LevelSwitcher'
 import { MentorSection, useMentor } from '../components/MentorLink'
-import { store } from '../data'
-import { useAuth } from '../state/auth'
 import { LatestPosts } from './Blog'
 import { formatMinutes, LevelBadge, ProgressBar, ProgressRing, Reveal } from '../components/ui'
 import { CAREER_SECTIONS, getLevel, levelLessons, levelModules } from '../lib/content'
@@ -37,7 +35,6 @@ export function Dashboard() {
   const { content } = useContent()
   const { state } = useLearner()
   const mentor = useMentor()
-  const { user } = useAuth()
   const [switchOpen, setSwitchOpen] = useState(false)
   const level = getLevel(content, state.level)!
   const progress = levelProgress(level, state)
@@ -72,16 +69,6 @@ export function Dashboard() {
           </div>
         </div>
       </header>
-
-      {store.mode === 'supabase' && !user && (
-        <div className="callout row-between" style={{ marginBottom: 'var(--space-4)' }} role="note">
-          <span><strong>Save your progress.</strong> Create a free account to keep your lessons, notes and bookmarks on every device.</span>
-          <span className="row">
-            <Link to="/account?mode=signup" className="btn btn-primary btn-sm">Create free account</Link>
-            <Link to="/account" className="btn btn-ghost btn-sm">Sign in</Link>
-          </span>
-        </div>
-      )}
 
       {announcements.map((a) => (
         <div key={a.id} className="callout" style={{ marginBottom: 'var(--space-4)' }} role="status">

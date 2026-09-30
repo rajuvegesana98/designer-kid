@@ -8,7 +8,6 @@ import { CheckItem, ConfirmDialog, EmptyState, formatDate, formatMinutes, LevelB
 import type { ChallengeCategory, LevelId } from '../content/types'
 import { Icon } from '../lib/icons'
 import { inline } from '../lib/markdown'
-import { useAuth } from '../state/auth'
 import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 import { useToast } from '../state/ui'
@@ -120,7 +119,6 @@ export function ChallengePage() {
   const { challengeId } = useParams()
   const { content } = useContent()
   const { state, saveChallengeWork, completeChallenge } = useLearner()
-  const { user, mode } = useAuth()
   const mentor = useMentor()
   const toast = useToast()
   const c = content.challenges.find((x) => x.id === challengeId)
@@ -277,11 +275,7 @@ export function ChallengePage() {
               <textarea id={notesId} className="textarea" value={notes} placeholder="What did you decide, what trade-offs did you make, and what would you do next?" onChange={(e) => { setNotes(e.target.value); persist({ notes: e.target.value }) }} />
               <span className="hint">Your draft saves automatically.</span>
             </div>
-            {mode === 'supabase' && !user && (
-              <p className="small muted">
-                <Link to="/account">Sign in</Link> to send your submission to the Designer Kid team. Without an account it’s saved on this device only.
-              </p>
-            )}
+            <p className="small muted">Your work and checklist are saved in this browser.</p>
             <div className="row">
               <button className="btn btn-primary" disabled={!canSubmit || submitting} onClick={() => (checkedCount < c.checklist.length ? setConfirm(true) : submit())}>
                 <Send size={16} aria-hidden /> {submitting ? 'Submitting…' : done ? 'Update submission' : 'Submit challenge'}

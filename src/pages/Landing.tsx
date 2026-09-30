@@ -1,5 +1,5 @@
 import { motion } from 'motion/react'
-import { ArrowRight, ChevronDown, LogIn } from 'lucide-react'
+import { ArrowRight, ChevronDown } from 'lucide-react'
 import type { CSSProperties } from 'react'
 import { Link } from 'react-router'
 import { Brand } from '../components/Brand'
@@ -7,17 +7,14 @@ import { HeroVisual, LevelIllustration } from '../components/Illustrations'
 import { MentorSection, useMentor } from '../components/MentorLink'
 import { LatestPosts } from './Blog'
 import { Reveal } from '../components/ui'
-import { store } from '../data'
 import { levelLessons, levelModules } from '../lib/content'
 import { Icon } from '../lib/icons'
-import { useAuth } from '../state/auth'
 import { useContent } from '../state/content'
 import { SiteFooter } from '../components/AppShell'
 import { ReviewsSection } from './Reviews'
 
 export function Landing() {
   const { content, isPreview } = useContent()
-  const { user } = useAuth()
   const mentor = useMentor()
   const h = content.home
 
@@ -31,14 +28,6 @@ export function Landing() {
           <a href="#paths" className="btn btn-ghost hide-sm">Learning paths</a>
           <Link to="/blog" className="btn btn-ghost hide-sm">Blog</Link>
           {mentor.enabled && <a href="#mentor" className="btn btn-ghost hide-sm">1:1 Connect</a>}
-          {store.mode === 'supabase' && !user && (
-            <>
-              <Link to="/account" className="btn btn-ghost">
-                <LogIn size={18} aria-hidden /> <span className="hide-sm">Sign in</span>
-              </Link>
-              <Link to="/account?mode=signup" className="btn hide-sm">Create free account</Link>
-            </>
-          )}
           <Link to="/start" className="btn btn-primary">Start learning</Link>
         </nav>
       </header>
@@ -56,7 +45,7 @@ export function Landing() {
                 </Link>
                 <a href="#paths" className="btn btn-lg">{h.secondaryCtaLabel}</a>
               </div>
-              <p className="subtle">{content.brand.tagline} Free to start — no account needed.</p>
+              <p className="subtle">{content.brand.tagline} Free, and no account needed — your progress saves in your browser.</p>
             </motion.div>
             {h.heroImage ? (
               <img src={h.heroImage} alt="" style={{ borderRadius: 'var(--r-card)', boxShadow: 'var(--shadow-2)' }} />
@@ -182,7 +171,6 @@ export function Landing() {
               <Link to="/start" className="btn btn-primary btn-lg">
                 {h.ctaLabel} <ArrowRight size={18} aria-hidden />
               </Link>
-              {store.mode === 'supabase' && !user && <Link to="/account?mode=signup" className="btn btn-lg">Create a free account</Link>}
             </div>
           </Reveal>
         </section>

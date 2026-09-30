@@ -294,6 +294,7 @@ function AdminLogin() {
             </div>
             {error && <p role="alert" style={{ color: 'var(--c-danger)' }}>{error}</p>}
             <button className="btn btn-primary btn-lg" disabled={busy}>{busy ? 'Signing in…' : 'Sign in'}</button>
+            <Link to="/account?forgot=1" className="btn btn-ghost btn-sm" style={{ alignSelf: 'center' }}>Forgot password?</Link>
           </form>
         )}
         <Link to="/" className="btn btn-ghost">Back to the site</Link>

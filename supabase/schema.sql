@@ -246,3 +246,23 @@ create policy "submissions: insert own" on public.submissions
     user_id = auth.uid()
     and not exists (select 1 from public.profiles p where p.id = auth.uid() and p.blocked)
   );
+
+-- ─── Open learning (also in migrations/003_open_learning.sql) ───────────
+
+drop policy if exists "reviews: signed-in users write own" on public.reviews;
+drop policy if exists "reviews: anyone submits" on public.reviews;
+create policy "reviews: anyone submits" on public.reviews
+  for insert with check (
+    (user_id is null or user_id = auth.uid())
+    and not exists (select 1 from public.profiles p where p.id = auth.uid() and p.blocked)
+  );
+
+-- Add "Blog" to the site menu (published and draft) if it isn't there yet.
+update public.site_content
+set data = jsonb_set(
+  data,
+  '{navigation}',
+  (data -> 'navigation') || '[{"id":"blog","label":"Blog","path":"/blog","visible":true}]'::jsonb
+)
+where data ? 'navigation'
+  and not exists (select 1 from jsonb_array_elements(data -> 'navigation') n where n ->> 'path' = '/blog');

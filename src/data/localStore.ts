@@ -30,7 +30,7 @@ const KEYS = {
 }
 
 const DEMO_ADMIN: AppUser = { id: 'demo-admin', email: 'admin@local', name: 'Admin (this browser)', isAdmin: true }
-const MAX_VERSIONS = 15
+const MAX_VERSIONS = 5
 const MAX_MEDIA_BYTES = 1_500_000
 
 function read<T>(key: string, fallback: T): T {
@@ -109,10 +109,20 @@ export function createLocalStore(): DataStore {
       return updatedAt
     },
     async publish(content, note) {
-      write(KEYS.published, content)
+      // Browsers allow ~5 MB, and each version is a full copy of the site,
+      // so keep as many recent versions as fit and never let history block publishing.
       const versions = read<StoredVersion[]>(KEYS.versions, [])
       versions.unshift({ id: crypto.randomUUID(), note, createdAt: new Date().toISOString(), author: DEMO_ADMIN.name, content })
-      write(KEYS.versions, versions.slice(0, MAX_VERSIONS))
+      localStorage.removeItem(KEYS.versions)
+      write(KEYS.published, content)
+      for (let keep = Math.min(MAX_VERSIONS, versions.length); keep > 0; keep--) {
+        try {
+          write(KEYS.versions, versions.slice(0, keep))
+          return
+        } catch {
+          /* too big — try fewer versions */
+        }
+      }
     },
     async listVersions() {
       return read<StoredVersion[]>(KEYS.versions, []).map(({ content: _content, ...v }) => v)

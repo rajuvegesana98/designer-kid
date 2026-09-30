@@ -5,7 +5,6 @@ import { EmptyState, PageHeader, Spinner, Tabs, timeAgo } from '../../components
 import type { SiteContent } from '../../content/types'
 import { store, type ActivityEvent, type LearnerRow, type Submission } from '../../data'
 import { levelLessons } from '../../lib/content'
-import { levelProgress } from '../../lib/progress'
 import { useAdmin } from '../state'
 
 export interface Analytics {
@@ -28,33 +27,26 @@ export function useAnalytics() {
 
 const DAY = 86_400_000
 
+/**
+ * Learners don't have accounts, so numbers come from anonymous activity events:
+ * choosing a level = a learner starting; lesson completions = learning activity.
+ */
 export function computeStats(content: SiteContent, a: Analytics) {
-  const byLevel = Object.fromEntries(content.levels.map((l) => [l.id, 0])) as Record<string, number>
-  let coursesDone = 0
-  let enrolments = 0
-  let lessonsDone = 0
   const now = Date.now()
-  const active = a.learners.filter((l) => now - new Date(l.lastActiveAt).getTime() < 7 * DAY).length
-  for (const l of a.learners) {
-    if (l.level) byLevel[l.level] = (byLevel[l.level] ?? 0) + 1
-    const level = content.levels.find((x) => x.id === l.level)
-    if (!level || !l.state?.completedLessons) continue
-    const p = levelProgress(level, l.state)
-    coursesDone += p.coursesDone
-    enrolments += p.coursesTotal
-    lessonsDone += Object.keys(l.state.completedLessons).length
-  }
-  const since30 = (t: string) => now - new Date(t).getTime() < 30 * DAY
+  const since = (t: string, days: number) => now - new Date(t).getTime() < days * DAY
+  const starts = a.events.filter((e) => e.type === 'level_selected')
+  const byLevel = Object.fromEntries(content.levels.map((l) => [l.id, starts.filter((e) => e.detail === l.id).length])) as Record<string, number>
+  const lessons = a.events.filter((e) => e.type === 'lesson_completed')
   return {
-    total: a.learners.length,
+    total: starts.length,
     byLevel,
-    active,
-    coursesDone,
-    completionRate: enrolments ? coursesDone / enrolments : 0,
-    lessonsDone,
-    submissions: a.submissions.length || a.events.filter((e) => e.type === 'challenge_submitted').length,
-    bookings30: a.events.filter((e) => e.type === 'booking_clicked' && since30(e.createdAt)).length,
-    lessons30: a.events.filter((e) => e.type === 'lesson_completed' && since30(e.createdAt)).length,
+    active: lessons.filter((e) => since(e.createdAt, 7)).length,
+    lessonsDone: lessons.length,
+    completionRate: 0,
+    coursesDone: 0,
+    submissions: a.events.filter((e) => e.type === 'challenge_submitted').length,
+    bookings30: a.events.filter((e) => e.type === 'booking_clicked' && since(e.createdAt, 30)).length,
+    lessons30: lessons.filter((e) => since(e.createdAt, 30)).length,
   }
 }
 
@@ -130,12 +122,12 @@ export function AdminDashboard() {
       ) : (
         <>
           <div className="grid grid-4">
-            <StatCard icon={<Users size={17} />} label="Total learners" value={stats.total} to="/admin/users" />
+            <StatCard icon={<Users size={17} />} label="Learners started" value={stats.total} hint="Times a level was chosen" />
             {draft.levels.map((l) => (
-              <StatCard key={l.id} icon={<span style={{ width: 10, height: 10, borderRadius: 3, background: l.color }} />} label={`${l.name} learners`} value={stats.byLevel[l.id] ?? 0} hint={stats.total ? `${Math.round(((stats.byLevel[l.id] ?? 0) / stats.total) * 100)}% of learners` : undefined} />
+              <StatCard key={l.id} icon={<span style={{ width: 10, height: 10, borderRadius: 3, background: l.color }} />} label={`${l.name} starts`} value={stats.byLevel[l.id] ?? 0} hint={stats.total ? `${Math.round(((stats.byLevel[l.id] ?? 0) / stats.total) * 100)}% of starts` : undefined} />
             ))}
-            <StatCard icon={<TrendingUp size={17} />} label="Active learners" value={stats.active} hint="Active in the last 7 days" />
-            <StatCard icon={<BookOpen size={17} />} label="Completed courses" value={stats.coursesDone} hint={`${Math.round(stats.completionRate * 100)}% course completion rate`} />
+            <StatCard icon={<TrendingUp size={17} />} label="Lessons completed" value={stats.active} hint="Last 7 days" />
+            <StatCard icon={<BookOpen size={17} />} label="Lessons completed" value={stats.lessonsDone} hint="All time" />
             <StatCard icon={<Target size={17} />} label="Challenge submissions" value={stats.submissions} to="/admin/users?tab=submissions" />
             <StatCard icon={<MessagesSquare size={17} />} label="1:1 booking clicks" value={stats.bookings30} hint="Last 30 days" to="/admin/connect" />
           </div>
@@ -301,6 +293,7 @@ export function AnalyticsPage() {
             <section className="card" aria-labelledby="lvl-h">
               <h2 id="lvl-h" style={{ fontSize: '1.1rem' }}>Learners by level</h2>
               <BarList label="Learners by level" total={stats.total} rows={draft.levels.map((l) => ({ key: l.id, label: l.name, value: stats.byLevel[l.id] ?? 0, swatch: l.color }))} />
+              <p className="subtle">Based on level choices. Learners use the site without accounts, so this counts starts, not unique people.</p>
             </section>
             <section className="card" aria-labelledby="funnel-h">
               <h2 id="funnel-h" style={{ fontSize: '1.1rem' }}>Where learners get to</h2>
@@ -332,7 +325,7 @@ export function AnalyticsPage() {
           </div>
           <div className="grid grid-4">
             <StatCard icon={<BookOpen size={17} />} label="Lessons completed (30 days)" value={stats.lessons30} />
-            <StatCard icon={<TrendingUp size={17} />} label="Course completion rate" value={`${Math.round(stats.completionRate * 100)}%`} hint="Completed courses ÷ courses in each learner’s level" />
+            <StatCard icon={<TrendingUp size={17} />} label="Learners started" value={stats.total} hint="Level chosen" />
             <StatCard icon={<MessagesSquare size={17} />} label="1:1 booking clicks (30 days)" value={stats.bookings30} />
             <StatCard icon={<Target size={17} />} label="Challenge submissions" value={stats.submissions} />
           </div>

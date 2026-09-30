@@ -234,16 +234,12 @@ export function createSupabaseStore(url: string, anonKey: string): DataStore {
       fail(error)
       return (data ?? []).map(toReview)
     },
-    async submitReview(review, user) {
+    async submitReview(review, user, autoApprove) {
       // Status is decided by the database (see the reviews trigger in schema.sql), not the browser.
-      if (!user) throw new Error('Please sign in to write a review.')
-      const { data, error } = await sb
-        .from('reviews')
-        .insert({ user_id: user.id, name: review.name, role: review.role, rating: review.rating, text: review.text })
-        .select()
-        .single()
+      const { error } = await sb.from('reviews').insert({ user_id: user?.id ?? null, name: review.name, role: review.role, rating: review.rating, text: review.text })
       fail(error)
-      return toReview(data)
+      // Visitors can't read pending reviews back, so report the status the database will apply.
+      return { ...review, id: '', userId: user?.id ?? null, status: autoApprove ? 'approved' : 'pending', featured: false, reply: '', createdAt: new Date().toISOString() }
     },
     async updateReview(id, patch) {
       const { error } = await sb.from('reviews').update(patch).eq('id', id)

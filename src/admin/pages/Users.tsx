@@ -63,7 +63,7 @@ export function UsersPage() {
   return (
     <>
       <PageHeader title="Users" eyebrow="People" actions={tab === 'learners' && rows.length > 0 && <button className="btn" onClick={exportCsv}><Download size={16} aria-hidden /> Export CSV</button>}>
-        {store.mode === 'local' ? 'Browser-only mode shows just the learner in this browser. Connect Supabase to see everyone who signs up.' : 'Everyone with a Designer Kid account.'}
+        {store.mode === 'local' ? 'Browser-only mode shows just the learner in this browser.' : 'Learners use Designer Kid without accounts (progress stays in their browser), so this list shows admin and staff accounts. Learner activity is in Dashboard and Analytics.'}
       </PageHeader>
       <Tabs<Tab> id="users" label="Users view" value={tab} onChange={(v) => setParams({ tab: v }, { replace: true })} tabs={[{ value: 'learners', label: 'Learners' }, { value: 'submissions', label: `Challenge submissions${data ? ` (${data.submissions.length})` : ''}` }]} />
       <div id="users-panel" role="tabpanel" style={{ marginTop: 'var(--space-5)' }}>

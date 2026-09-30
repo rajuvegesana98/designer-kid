@@ -1,6 +1,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Check, X } from 'lucide-react'
 import { useEffect, useId, useRef, type CSSProperties, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
 import type { Level } from '../content/types'
 import { Icon } from '../lib/icons'
 
@@ -108,7 +109,8 @@ export function Modal({
 }) {
   const ref = useFocusTrap(open, onClose)
   const titleId = useId()
-  return (
+  // Portal to <body> so dialogs are never clipped by a parent with backdrop-filter/transform.
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -142,13 +144,14 @@ export function Modal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 
 export function Sheet({ open, onClose, title, children }: { open: boolean; onClose: () => void; title: string; children: ReactNode }) {
   const ref = useFocusTrap(open, onClose)
-  return (
+  return createPortal(
     <AnimatePresence>
       {open && (
         <motion.div
@@ -174,7 +177,8 @@ export function Sheet({ open, onClose, title, children }: { open: boolean; onClo
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }
 

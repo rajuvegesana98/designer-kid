@@ -57,7 +57,7 @@ npx tsc --noEmit -p tsconfig.app.json
 ```
 
 ## Database setup
-Supabase SQL editor → run `supabase/schema.sql` (idempotent; already includes migrations 002 and 003).
+Supabase SQL editor → run `supabase/schema.sql` (idempotent; already includes migrations 002, 003 and 004).
 Make an admin: `insert into public.admins (user_id) select id from auth.users where email = '<your email>';`
 Then open `/admin` and **Publish** once. Details: [docs/DATABASE.md](docs/DATABASE.md).
 
@@ -92,8 +92,7 @@ Full annotated tree: [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md).
 · `supabase/schema.sql` · `src/content/types.ts` (content contract) · `src/data/index.ts` (backend switch).
 
 ## Known limitations
-Learner progress is per browser · migrations 002/003 pending on production · no booking link configured yet ·
-minimal SEO tags · analytics are anonymous counts · PPT files are attached, not converted to slides.
+Learner progress is per browser · migrations 002/003/004 pending on production · no booking link configured yet · analytics are anonymous counts · PPT files are attached, not converted to slides.
 See [docs/MASTER_SPECIFICATION.md](docs/MASTER_SPECIFICATION.md#current-state) and [docs/TECHNICAL_DEBT.md](docs/TECHNICAL_DEBT.md).
 
 ## Future development

@@ -88,7 +88,7 @@ curl -s -o /dev/null -w "%{http_code}\n" "$U/rest/v1/profiles?select=blocked&lim
 ### STEP 8 — Apply outstanding database migrations (one-time, if not yet done)
 
 At hand-off 002 and 003 had **not** been run on the live project. Supabase → SQL Editor → paste and run
-`supabase/migrations/002_user_management.sql`, then `supabase/migrations/003_open_learning.sql`. (Alternatively run all of
+`supabase/migrations/002_user_management.sql`, then `003_open_learning.sql`, then `004_hardening.sql`. (Alternatively run all of
 `supabase/schema.sql` — idempotent.) Re-run the second `curl` in STEP 7 → 200.
 
 ### STEP 9 — Run the app

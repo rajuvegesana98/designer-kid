@@ -7,6 +7,11 @@ work. Nothing here has been changed in the code.
 
 Last verified: 30 Sep 2026 (docs v2.0)
 
+> **v2.1 update (30 Sep 2026):** fixed in code — anonymous-write abuse / rate limiting (migration 004, owner must run
+> it), deep-link 404 status + SEO tags/sitemap/robots (#23), seed chunk on every visit, per-page titles, error boundary
+> (`src/components/ErrorBoundary.tsx`), media-picker image resizing, focus management, warning colour contrast,
+> duplicate font request. Still open: running migrations 002–004, Auth URL/SMTP, CI tests, CSP, bundle size.
+
 Priority legend: **P0** = fix now (production feature broken or data/security risk) · **P1** = next sprint ·
 **P2** = planned improvement · **P3** = nice to have.
 

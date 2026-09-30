@@ -27,7 +27,7 @@ GitHub → Settings → Secrets and variables → Actions → **Variables**: `VI
 The workflow sets `BASE_PATH=/designer-kid/` automatically.
 
 ## Supabase setup (fresh project)
-1. SQL Editor → run `supabase/schema.sql` (idempotent; includes migrations 002 and 003 at the end).
+1. SQL Editor → run `supabase/schema.sql` (idempotent; includes migrations 002, 003 and 004 at the end).
 2. Authentication → URL Configuration: Site URL `https://rajuvegesana98.github.io/designer-kid/`;
    Redirect URLs `https://rajuvegesana98.github.io/designer-kid/**` and `http://localhost:5173/**` (Vite default dev port; add any other port you use).
 3. Create the admin login (Authentication → Users → Add user, or sign in on `/account` if sign-up is
@@ -42,6 +42,7 @@ The workflow sets `BASE_PATH=/designer-kid/` automatically.
 | `schema.sql` (base) | tables, RLS, publish RPC, storage, reviews | ✅ run |
 | `migrations/002_user_management.sql` | `profiles.blocked`, admin profile updates, admin list management, suspended users can't post | ⏳ owner to run |
 | `migrations/003_open_learning.sql` | anyone can submit a review (still moderated); adds Blog to the published menu | ⏳ owner to run |
+| `migrations/004_hardening.sql` | rate limits for events/reviews, no event impersonation, draft-only content writes, no deletes | ⏳ owner to run (after 003) |
 
 Check from a terminal (anonymous key):
 ```bash

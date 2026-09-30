@@ -6,6 +6,13 @@ This document records the current search-engine and accessibility state of Desig
 
 Last verified: 30 Sep 2026 (docs v2.0)
 
+> **v2.1 update (30 Sep 2026) — verified live:** `scripts/postbuild.mjs` now writes one `index.html` copy per known route
+> (255 pages) so deep links answer **200** (after GitHub Pages' trailing-slash 301); adds canonical, Open Graph and Twitter
+> tags with `public/og-image.png` (1200×630) when `SITE_URL` is set (the deploy workflow sets it); writes `robots.txt`
+> (disallows `/admin`) and `sitemap.xml` (252 URLs). Every main page sets its own tab title (`src/lib/usePageTitle.ts`).
+> Accessibility fixes: focus moves to `#main` on route change, `--c-warning` darkened to `#8f5600` (AA contrast),
+> invalid `aria-controls` removed from tabs. Tables below describe the v2.0 state.
+
 ---
 
 ## 1. SEO

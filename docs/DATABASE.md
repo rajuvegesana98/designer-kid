@@ -10,6 +10,10 @@ same interface (see `docs/API.md`).
 
 Last verified: 30 Sep 2026 (docs v2.0)
 
+> **v2.1 update:** migration `004_hardening.sql` adds `client_hash` (text, indexed) to `events` and `reviews`, the
+> functions `client_hash()`, `events_guard()` and `reviews_rate_limit()` with `before insert` triggers, and replaces the
+> `site_content` admin write policy with draft-only insert/update policies (no delete). Run order: 002 → 003 → 004.
+
 **Status legend.** **Confirmed** = seen in code/SQL or verified at hand-off · **Inferred** = reasoned from code (reason given) ·
 **Unknown** = cannot be verified from the repository (what to check is stated) · **Pending** = in the repository but not yet
 applied to the live database.

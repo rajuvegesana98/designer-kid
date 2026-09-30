@@ -11,6 +11,13 @@ usual XSS-to-session-theft exposure of a browser-stored admin session with no Co
 
 Last verified: 30 Sep 2026 (docs v2.0)
 
+> **v2.1 update (30 Sep 2026):** migration `supabase/migrations/004_hardening.sql` addresses findings #1–#3 below and the
+> content-delete risk: anonymous `events` are limited to learner event types, `user_name` must be `Guest` (no impersonation)
+> and inserts are capped at 60/minute per connection; `reviews` are capped at 3/hour per connection and 30/hour overall
+> (admins exempt); `site_content` can only be inserted/updated as the `draft` row and never deleted through the API.
+> Connections are identified by an MD5 hash of the client IP (the IP is not stored). **004 is written but must be run by
+> the owner** (after 002 and 003). Still open: captcha, CSP, open sign-ups setting, admin session in localStorage.
+
 **Status legend.** **Confirmed** = seen in code/config or verified at hand-off · **Inferred** = reasoned from code (reason given) ·
 **Unknown** = not verifiable from the repository (what to check is stated). Severity is relative to this project (public
 learning site, one admin, no payments, no learner accounts): **High** / **Medium** / **Low** / **Info**.

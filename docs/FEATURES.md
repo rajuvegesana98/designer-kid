@@ -9,6 +9,9 @@ separately. A verified content inventory is at the end. This file replaces the e
 
 Last verified: 30 Sep 2026 (docs v2.0)
 
+> **v2.1 update:** per-page tab titles, crash recovery screen, SEO/social previews, sitemap, working deep links,
+> Blog added to the menu automatically when posts exist, spam limits on reviews (after migration 004).
+
 ## Status legend
 
 | Status | Meaning |

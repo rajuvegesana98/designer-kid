@@ -2,7 +2,24 @@
 
 All notable changes to Designer Kid. Dates are from the git history (all on 30 Sep 2026, local time).
 Format loosely follows [Keep a Changelog](https://keepachangelog.com/). Versions below are documentation
-milestones; `package.json` still reports `0.0.0` (never bumped).
+milestones; `package.json` reports `2.1.0` from v2.1.
+
+## [2.1.0] — 2026-09-30
+### Added
+- Per-route `index.html` pages (255) so deep links return HTTP 200 on GitHub Pages; `robots.txt`, `sitemap.xml`
+  (252 URLs), canonical + Open Graph + Twitter tags and `public/og-image.png` (needs `SITE_URL`, set by the workflow).
+- Per-page browser tab titles (`src/lib/usePageTitle.ts`).
+- `ErrorBoundary` with a recovery screen.
+- `supabase/migrations/004_hardening.sql` (also appended to `schema.sql`): events/reviews rate limits, events type and
+  name restrictions, draft-only content writes with no deletes. **Must be run in Supabase after 002 and 003.**
+### Changed
+- `withDefaults` uses `src/content/defaults.ts` + the blog chunks instead of importing the whole seed on every visit.
+- Blog menu item is added automatically when blog posts exist and the menu has no `/blog` link.
+- Media picker uploads are resized/converted to WebP like the Media library (shared `optimise()` in `admin/uploads.tsx`).
+### Fixed
+- Keyboard focus moves to the main content after navigation.
+- Warning colour meets WCAG AA contrast (`#8f5600`).
+- Removed invalid `aria-controls` from tabs; default fonts no longer requested twice.
 
 ## [2.0.0-docs] — 2026-09-30
 ### Added

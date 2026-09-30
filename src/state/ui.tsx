@@ -2,6 +2,7 @@ import { AnimatePresence, motion, MotionConfig } from 'motion/react'
 import { CheckCircle2, CircleAlert, X } from 'lucide-react'
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react'
 import type { SiteContent } from '../content/types'
+import { pageTitle } from '../lib/usePageTitle'
 import { ensureFonts, themeVars } from '../lib/theme'
 
 /* ─── Colour mode ──────────────────────────────────────────────────────── */
@@ -53,7 +54,7 @@ export function ThemeProvider({ content, children }: { content: SiteContent; chi
   }, [content.theme, resolved])
 
   useEffect(() => {
-    document.title = `${content.brand.name} — ${content.brand.tagline}`
+    if (!pageTitle.active) document.title = `${content.brand.name} — ${content.brand.tagline}`
     const link = document.querySelector<HTMLLinkElement>('link[rel="icon"]')
     if (link && content.brand.faviconUrl) link.href = content.brand.faviconUrl
   }, [content.brand])

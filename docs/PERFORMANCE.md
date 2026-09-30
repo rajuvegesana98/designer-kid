@@ -6,6 +6,11 @@ This document records measured bundle sizes, what each chunk contains, how fonts
 
 Last verified: 30 Sep 2026 (docs v2.0)
 
+> **v2.1 update (30 Sep 2026) — verified live:** the 700 kB+ seed chunk no longer loads on normal visits. `withDefaults`
+> now fills small missing sections from `src/content/defaults.ts` and loads only the blog chunks when posts are missing;
+> the full seed loads only if a whole course section is missing. The default fonts are no longer requested twice
+> (`src/lib/theme.ts`). Media-picker uploads are resized to WebP ≤ 2000 px like the Media library.
+
 ---
 
 ## 1. Build output (measured)

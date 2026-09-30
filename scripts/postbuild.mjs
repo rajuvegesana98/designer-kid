@@ -96,7 +96,7 @@ if (siteUrl) {
   const today = new Date().toISOString().slice(0, 10)
   const urls = routes
     .filter((r) => !noIndex.has(r))
-    .map((r) => `  <url><loc>${siteUrl}${r === '/' ? '/' : r}</loc><lastmod>${today}</lastmod></url>`)
+    .map((r) => `  <url><loc>${siteUrl}${r === '/' ? '/' : r + '/'}</loc><lastmod>${today}</lastmod></url>`)
     .join('\n')
   writeFileSync(join(dist, 'sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`)
   console.log(`✓ Wrote robots.txt and sitemap.xml (${routes.length - noIndex.size} URLs)`)

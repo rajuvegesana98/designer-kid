@@ -95,27 +95,34 @@ DESIGN SYSTEM:    Bricolage Grotesque + Instrument Sans (14 selectable fonts), r
 ANIMATIONS:       Motion (page fade, modal/sheet/toast, layoutId pills, reveal-on-scroll, progress,
                   hover/tap), CSS transitions; MotionConfig reducedMotion="user" + CSS reduced-motion rule.
 SECURITY:         RLS everywhere, admin table, server-checked publish; risks: anonymous event/review inserts
-                  without rate limiting, possible open sign-ups, admin session in localStorage, no CSP,
+                  (rate limits in migration 004, pending), possible open sign-ups, admin session in localStorage, no CSP,
                   public bucket.                                                   → SECURITY.md
 DEPLOYMENT:       push main → Actions (npm ci, build with BASE_PATH + VITE_* vars) → Pages; DB changes by
                   hand in the Supabase SQL editor; content by admin Publish (no deploy). → DEPLOYMENT.md
-KNOWN ISSUES:     migrations 002/003 not applied; seed chunk loads on every visit until one republish;
-                  no booking link; Blog missing from live menu; deep links return HTTP 404 (served by
-                  404.html); SEO minimal; analytics approximate; image picker doesn't resize.
+KNOWN ISSUES:     migrations 002/003/004 not applied; no booking link; analytics approximate.
+                  (Fixed in v2.1: seed chunk on every visit, Blog missing from menu, deep-link 404s,
+                  SEO tags/sitemap/robots, image picker resizing, per-page titles.)
 TECHNICAL DEBT:   25 items (P0: migrations, Auth URL/SMTP) → TECHNICAL_DEBT.md
 FUTURE SCOPE:     6-phase roadmap (recommendations)                               → FUTURE_ROADMAP.md
 ```
 
 ---
 
+## v2.1 changes (30 Sep 2026)
+
+Implemented from this audit's fix-first list and verified live: deep links return 200 (per-route pages), Open Graph /
+Twitter / canonical tags, `robots.txt`, `sitemap.xml`, per-page tab titles, error boundary, focus management, AA warning
+colour, lighter content loading (no seed chunk), Blog in the menu automatically, media-picker image resizing, database
+hardening SQL (`004_hardening.sql`, owner to run). See [CHANGELOG.md](../CHANGELOG.md).
+
 ## Current state
 
 | | Items |
 |---|---|
 | **Working (Confirmed)** | Learner site end to end (onboarding, dashboard, lessons, widgets, challenges, Career Centre, blog, resources, progress, search, notifications, PDFs, dark mode, responsive); admin sign-in, forgot/reset link page, show/hide password; content editing + preview + publish + versions; offers; theme; media; reviews moderation (for reviews that exist); 34 browser checks passing; live smoke test passing |
-| **Partially working** | 1:1 (panel shows "Booking opens soon" — no link set) · Blog (works, but not in the live menu) · analytics (anonymous, capped at latest 1000 events) · PPT preview (needs public URL) · PDF (browser print dialog) · Motion Studio (loads in dev; timing edit not verified) |
+| **Partially working** | 1:1 (panel shows "Booking opens soon" — no link set) · analytics (anonymous, capped at latest 1000 events) · PPT preview (needs public URL) · PDF (browser print dialog) · Motion Studio (loads in dev; timing edit not verified) |
 | **Broken on production** | Anonymous reviews rejected (needs 003) · suspend / make-admin / edit-other-profile (needs 002) |
-| **Missing** | Custom domain, SEO tags/sitemap/robots, CI tests, error monitoring, rate limiting, achievements editor, cross-device learner sync, UI/UX Pro Max review |
+| **Missing** | Custom domain, CI tests, error monitoring, achievements editor, cross-device learner sync, UI/UX Pro Max review |
 | **Unknown** | Supabase Auth Site URL/redirects, SMTP, whether sign-ups are enabled, password policy, backups on the plan, real-user performance metrics |
 
 ---
@@ -166,12 +173,11 @@ and an SMTP provider (e.g. Resend) if those are added.
 - Learners' progress cannot migrate (it lives in their browsers).
 
 ## What should be fixed first
-1. Run `002_user_management.sql`, then `003_open_learning.sql`, in the Supabase SQL editor.
+1. Run `002_user_management.sql`, then `003_open_learning.sql`, then `004_hardening.sql`, in the Supabase SQL editor.
 2. Verify Supabase Auth → URL Configuration (Site URL + redirects) and consider custom SMTP.
 3. Disable public sign-ups in Supabase Auth (learners don't use accounts).
-4. In Admin: set the booking link, add Blog to the menu, then **Publish once** (also stops the seed chunk
-   loading on every visit).
-5. Add rate limiting / abuse protection for anonymous `events` and `reviews` inserts.
+4. In Admin: set the booking link, then **Publish once**.
+5. ~~Rate limiting for anonymous writes~~ — done in v2.1 (migration 004; takes effect once run).
 
 ## What should never be deleted
 The `site_content` rows (`published`, `draft`) · `content_history` · `public.admins` · the `media` bucket ·

@@ -142,7 +142,7 @@ Skip this section for browser-only mode.
 1. Create a Supabase project (supabase.com → New project). Note the project ref and region.
 2. Open **SQL Editor → New query**, paste the whole of `supabase/schema.sql`, **Run**.
    - The file is idempotent ("Safe to re-run", `schema.sql:3`).
-   - It **already contains migrations 002 and 003 appended at the end**: section "User management (also in
+   - It **already contains migrations 002, 003 and (v2.1) 004 appended at the end**: section "User management (also in
      migrations/002_user_management.sql)" from line 202 and "Open learning (also in migrations/003_open_learning.sql)"
      from line 250. **Confirmed** by `diff`: the 002 body matches `schema.sql` lines 204–249 (one blank line differs) and
      the 003 body matches lines 252–268 exactly. On a fresh project you therefore do **not** need to run the files in
@@ -159,7 +159,7 @@ Skip this section for browser-only mode.
    sign-up is not linked in the UI).
 
 > Existing live project (`zcxnlelzhkwbvittgcuj`): the base schema has been run, but migrations **002 and 003 have NOT**
-> (verified at hand-off). Run `supabase/migrations/002_user_management.sql` then `003_open_learning.sql` there
+> (verified at hand-off). Run `supabase/migrations/002_user_management.sql`, `003_open_learning.sql`, then `004_hardening.sql` there
 > (or simply re-run the whole `schema.sql`, which is idempotent).
 
 ## 8. Make an admin

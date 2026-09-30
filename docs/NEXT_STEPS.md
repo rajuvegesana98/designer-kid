@@ -1,8 +1,8 @@
 # Open items, limitations and next steps
 
 ## Owner actions pending at hand-off
-1. Run `supabase/migrations/002_user_management.sql` then `003_open_learning.sql` in the Supabase SQL editor
-   (project `zcxnlelzhkwbvittgcuj`). Until 003 runs, anonymous visitors' reviews are rejected by the database
+1. Run `supabase/migrations/002_user_management.sql`, then `003_open_learning.sql`, then `004_hardening.sql` in the
+   Supabase SQL editor (project `zcxnlelzhkwbvittgcuj`). Until 003 runs, anonymous visitors' reviews are rejected by the database
    and the Blog isn't in the published menu (Admin → Blog also offers a one-click "Add Blog to the menu").
 2. Admin → 1:1 Connect: add the booking link and photo. Theme: logo/favicon. Website → Footer: email/LinkedIn.
    Then **Publish**.

@@ -84,7 +84,14 @@ Seed content: src/content/seed/* (used when nothing is published yet, and to bac
 
 ## Gotchas
 
-- GitHub Pages deep links return HTTP 404 but serve `404.html` (a copy of `index.html`) — expected.
+- `scripts/postbuild.mjs` writes an `index.html` copy per known route (from the seed files) so deep links return 200;
+  routes added later in the admin fall back to `404.html` (HTTP 404 but the app still renders). With `SITE_URL` set
+  (the deploy workflow sets it) it also adds OG/canonical tags, `robots.txt` and `sitemap.xml`.
+- Page titles: call `usePageTitle(title)` (`src/lib/usePageTitle.ts`) in a page; the theme provider only sets the
+  default title when no page owns it.
+- Small content defaults (reviews settings, notifications, promos) live in `src/content/defaults.ts` so
+  `withDefaults` doesn't import the big seed. Keep new small sections there.
+- The app is wrapped in `components/ErrorBoundary.tsx` (recovery screen instead of a blank page).
 - Supabase free projects pause after ~1 week without traffic; built-in auth email is limited to ~2/hour
   (only matters for admin password resets now).
 - Browser-only mode keeps only as many published versions as fit in ~5 MB of localStorage.

@@ -1,0 +1,7 @@
+{
+  "name": "designer-kid-e2e",
+  "private": true,
+  "type": "module",
+  "description": "Browser tests for Designer Kid. See docs/TESTING.md",
+  "dependencies": { "playwright-core": "^1.55.0" }
+}

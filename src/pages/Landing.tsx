@@ -40,7 +40,7 @@ export function Landing() {
               <h1 style={{ fontSize: 'clamp(2.4rem, 1.6rem + 3.4vw, 4.2rem)', letterSpacing: '-0.035em' }}>{h.heroTitle}</h1>
               <p className="lead" style={{ maxWidth: 560 }}>{h.heroDescription}</p>
               <div className="row">
-                <Link to="/start" className="btn btn-primary btn-lg">
+                <Link to="/start" className="btn btn-primary btn-lg btn-mentor-highlight">
                   {h.ctaLabel} <ArrowRight size={18} aria-hidden />
                 </Link>
                 <a href="#paths" className="btn btn-lg">{h.secondaryCtaLabel}</a>
@@ -168,7 +168,7 @@ export function Landing() {
             <h2>Ready to find your starting point?</h2>
             <p className="lead">It takes less than a minute.</p>
             <div className="row" style={{ justifyContent: 'center' }}>
-              <Link to="/start" className="btn btn-primary btn-lg">
+              <Link to="/start" className="btn btn-primary btn-lg btn-mentor-highlight">
                 {h.ctaLabel} <ArrowRight size={18} aria-hidden />
               </Link>
             </div>

@@ -58,7 +58,7 @@ export function MentorSection({ id = 'mentor', compact }: { id?: string; compact
           </div>
           <div className="row" style={{ marginTop: 6 }}>
             {mentor.available ? (
-              <MentorLink className="btn btn-primary btn-lg" />
+              <MentorLink className="btn btn-primary btn-lg btn-mentor-highlight" />
             ) : email ? (
               <a className="btn btn-primary btn-lg" href={`mailto:${email}?subject=${encodeURIComponent('1:1 session request')}`}>
                 <Mail size={18} aria-hidden /> {mentor.ctaLabel}

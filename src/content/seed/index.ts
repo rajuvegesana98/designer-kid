@@ -140,7 +140,7 @@ export const seedContent: SiteContent = {
     role: 'Founder, Designer Kid',
     bio: 'Book a one-to-one session for portfolio, resume or LinkedIn reviews, career guidance, Figma help, interview preparation or project feedback.',
     photo: '',
-    bookingUrl: '',
+    bookingUrl: 'https://topmate.io/harikrishnam_raju/',
     ctaLabel: 'Request a 1:1 session',
     topics: ['Portfolio review', 'Resume review', 'LinkedIn review', 'Career guidance', 'UI/UX doubts', 'Figma help', 'Interview preparation', 'Project feedback', 'General mentorship'],
     enabled: true,

@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 import {
-  BookOpen, Briefcase, ChevronRight, ExternalLink, Home, Library, Link2, Menu, MessagesSquare, Newspaper, Moon, Search, Settings2, Star, Sun, Target, TrendingUp, UserRound,
+  BookOpen, Briefcase, ChevronRight, ExternalLink, Home, Library, Link2, Menu, MessageCircle, MessagesSquare, Newspaper, Moon, Search, Settings2, Star, Sun, Target, TrendingUp, UserRound,
   type LucideIcon,
 } from 'lucide-react'
 import { useEffect, useState, type CSSProperties } from 'react'
@@ -287,9 +287,16 @@ export function SiteFooter() {
               <Link key={l.id} to={l.url} className="muted">{l.label}</Link>
             ),
           )}
-          {f.social.map((l) => (
-            <a key={l.id} href={l.url} target="_blank" rel="noreferrer" className="muted">{l.label}</a>
-          ))}
+          {f.social.map((l) => {
+            const isWhatsApp = l.url.includes('wa.me') || l.url.includes('whatsapp.com')
+            const SocialIcon = isWhatsApp ? MessageCircle : Link2
+            return (
+              <a key={l.id} href={l.url} target="_blank" rel="noreferrer" className="muted row" style={{ gap: 4 }}>
+                <SocialIcon size={14} aria-hidden />
+                {l.label}
+              </a>
+            )
+          })}
           {f.email && <a href={`mailto:${f.email}`} className="muted">{f.email}</a>}
         </nav>
       </div>

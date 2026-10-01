@@ -131,7 +131,10 @@ export const seedContent: SiteContent = {
       { id: 'l3', label: 'Career Centre', url: '/career' },
       { id: 'l4', label: 'Resources', url: '/resources' },
     ],
-    social: [],
+    social: [
+      { id: 'social-linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/in/harikrishnam-raju/' },
+      { id: 'social-whatsapp', label: 'WhatsApp', url: 'https://wa.me/919686959787' },
+    ],
     copyright: '© 2026 Designer Kid. All rights reserved.',
     email: '',
   },

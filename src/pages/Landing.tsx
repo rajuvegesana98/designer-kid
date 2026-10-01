@@ -12,7 +12,7 @@ import { Icon } from '../lib/icons'
 import { useContent } from '../state/content'
 import { SiteFooter } from '../components/AppShell'
 import { ReviewsSection } from './Reviews'
-import { UXMarquee, DesignRulers } from '../components/LandingChrome'
+import { UXMarquee, TopRuler, BottomRuler } from '../components/LandingChrome'
 
 export function Landing() {
   const { content, isPreview } = useContent()
@@ -21,7 +21,7 @@ export function Landing() {
 
   return (
     <div className="canvas-bg landing-chrome" style={{ minHeight: '100dvh' }}>
-      <DesignRulers />
+      <TopRuler />
       <div className="landing-chrome__body">
         <UXMarquee />
         <div className="landing-chrome__content">
@@ -183,6 +183,7 @@ export function Landing() {
       <SiteFooter />
         </div>{/* landing-chrome__content */}
       </div>{/* landing-chrome__body */}
+      <BottomRuler />
     </div>
   )
 }

@@ -17,10 +17,19 @@ const UX_TERMS = [
 ]
 
 export function UXMarquee() {
+  const [hovered, setHovered] = useState(false)
   const items = [...UX_TERMS, ...UX_TERMS]
   return (
-    <div className="ux-marquee" aria-hidden="true">
-      <div className="ux-marquee__inner">
+    <div
+      className="ux-marquee"
+      aria-hidden="true"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <div
+        className="ux-marquee__inner"
+        style={{ animationDuration: hovered ? '90s' : '32s' }}
+      >
         {items.map((term, i) =>
           term === '·' ? (
             <span key={i} className="ux-marquee__item ux-marquee__item--dot" />
@@ -33,6 +42,14 @@ export function UXMarquee() {
       </div>
     </div>
   )
+}
+
+export function TopRuler() {
+  return <Ruler position="top" />
+}
+
+export function BottomRuler() {
+  return <Ruler position="bottom" />
 }
 
 function Ruler({ position }: { position: 'top' | 'bottom' }) {
@@ -72,11 +89,7 @@ function Ruler({ position }: { position: 'top' | 'bottom' }) {
     >
       <div className="design-ruler__track">
         {ticks.map(({ x, major }) => (
-          <span
-            key={x}
-            className="design-ruler__tick"
-            style={{ left: x, height: major ? 12 : 5 }}
-          >
+          <span key={x} className="design-ruler__tick" style={{ left: x, height: major ? 12 : 5 }}>
             {major && x > 0 && (
               <span className="design-ruler__label">{x}</span>
             )}
@@ -89,14 +102,5 @@ function Ruler({ position }: { position: 'top' | 'bottom' }) {
         </div>
       )}
     </div>
-  )
-}
-
-export function DesignRulers() {
-  return (
-    <>
-      <Ruler position="top" />
-      <Ruler position="bottom" />
-    </>
   )
 }

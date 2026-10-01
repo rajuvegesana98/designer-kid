@@ -956,6 +956,7 @@ kbd {
   align-items: flex-start;
   border-bottom: none;
   border-top: 1px solid var(--c-line-strong);
+  margin-top: auto;
 }
 .design-ruler__track {
   position: absolute;
@@ -1011,11 +1012,12 @@ kbd {
   overflow: hidden;
   background: color-mix(in oklab, var(--c-surface) 94%, var(--c-primary));
   border-right: 1px solid var(--c-line-strong);
-  pointer-events: none;
+  pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  cursor: default;
 }
 .ux-marquee__inner {
   display: flex;

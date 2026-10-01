@@ -20,9 +20,11 @@ export function Landing() {
   const h = content.home
 
   return (
-    <div className="canvas-bg landing-frame" style={{ minHeight: '100dvh' }}>
+    <div className="canvas-bg landing-chrome" style={{ minHeight: '100dvh' }}>
       <DesignRulers />
-      <UXMarquee />
+      <div className="landing-chrome__body">
+        <UXMarquee />
+        <div className="landing-chrome__content">
       <a href="#main" className="skip-link">Skip to content</a>
       {isPreview && <div className="banner banner-preview" role="status"><strong>Preview</strong> Unpublished draft — this is how the homepage will look.</div>}
       <header className="page row-between" style={{ paddingTop: 20, paddingBottom: 0 }}>
@@ -179,6 +181,8 @@ export function Landing() {
         </section>
       </main>
       <SiteFooter />
+        </div>{/* landing-chrome__content */}
+      </div>{/* landing-chrome__body */}
     </div>
   )
 }

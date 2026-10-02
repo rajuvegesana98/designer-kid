@@ -13,16 +13,16 @@ import { useContent } from '../state/content'
 import { useLearner } from '../state/learner'
 import { Landing } from './Landing'
 import { AppShell } from '../components/AppShell'
+import { GameDashboard } from './GameDashboard'
 
 export function Home() {
   const { state } = useLearner()
   const { content } = useContent()
-  return getLevel(content, state.level) ? (
+  if (!getLevel(content, state.level)) return <Landing />
+  return (
     <AppShell>
-      <Dashboard />
+      {state.gameMode ? <GameDashboard /> : <Dashboard />}
     </AppShell>
-  ) : (
-    <Landing />
   )
 }
 

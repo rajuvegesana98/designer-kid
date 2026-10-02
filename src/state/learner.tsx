@@ -29,6 +29,7 @@ interface LearnerCtx {
   synced: boolean
   setLevel(level: LevelId): void
   setName(name: string): void
+  setGameMode(on: boolean): void
   completeLesson(lessonId: string, title: string): void
   uncompleteLesson(lessonId: string): void
   visitLesson(lessonId: string): void
@@ -112,6 +113,9 @@ export function LearnerProvider({ children }: { children: ReactNode }) {
       },
       setName(name) {
         update((s) => ({ ...s, name }))
+      },
+      setGameMode(on) {
+        update((s) => ({ ...s, gameMode: on }))
       },
       completeLesson(lessonId, title) {
         update((s) => ({ ...s, completedLessons: { ...s.completedLessons, [lessonId]: new Date().toISOString() } }), true)

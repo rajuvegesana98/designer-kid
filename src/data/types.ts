@@ -14,6 +14,7 @@ export interface ChallengeWork {
 export interface LearnerState {
   name: string
   level: LevelId | null
+  gameMode?: boolean
   completedLessons: Record<string, string>
   completedChallenges: Record<string, string>
   /** `${guideId}:${itemIndex}` → checked */

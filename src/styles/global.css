@@ -1290,3 +1290,12 @@ h1.inline-editable, h3.inline-editable { margin: 0 0 8px; }
 .password-field .input { padding-right: 52px; }
 .password-toggle { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 44px; height: 40px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 10px; color: var(--c-text-2); cursor: pointer; }
 .password-toggle:hover { background: var(--c-surface-3); color: var(--c-text); }
+
+/* ─── Game Mode ─────────────────────────────────────────────────────────── */
+
+.game-header { display: flex; align-items: center; justify-content: space-between; }
+.game-icon-wrap { width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center; flex-shrink: 0; }
+.game-stat-card { border: 1px solid var(--c-line-strong); }
+.quest-card { gap: 12px; }
+.quest-done { background: var(--c-surface-2); }
+
